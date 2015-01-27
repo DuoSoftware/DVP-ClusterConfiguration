@@ -1,0 +1,24 @@
+{
+  "name": "DVP-ClusterConfiguration",
+  "version": "0.0.1",
+  "dependencies": {
+    "restify": "^2.8.5"
+    "swagger-restify-express": "~0.2.1"
+  },
+  "description": "Cluster Configuration for DVP",
+  "main": "app.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DuoSoftware/DVP-ClusterConfiguration.git"
+  },
+  "author": "Sukitha Jayasingha",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuoSoftware/DVP-ClusterConfiguration/issues"
+  },
+  "homepage": "https://github.com/DuoSoftware/DVP-ClusterConfiguration"
+}
