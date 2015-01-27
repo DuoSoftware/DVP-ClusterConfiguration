@@ -1,0 +1,3 @@
+[submodule "DVP-Common"]
+	path = DVP-Common
+	url = https://github.com/DuoSoftware/DVP-Common
