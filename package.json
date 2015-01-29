@@ -4,11 +4,14 @@
   "description": "",
   "main": "RESTMessageHandler.js",
   "dependencies": {
+    "config": "^1.10.0",
     "restify": "^2.8.5",
     "swagger-restify-express": "^0.2.1",
     "winston": "^0.8.3"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "should": "^4.6.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

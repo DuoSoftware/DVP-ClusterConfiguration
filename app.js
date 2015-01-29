@@ -4,14 +4,49 @@
 var restify = require('restify');
 var sre = require('swagger-restify-express');
 var http = require('http');
-
 var winston = require('winston');
-
-winston.log('info', 'Hello distributed log files!');
-winston.info('Hello again distributed logs');
+var restMessageHandler = require('./RESTMessageHandler.js');
 
 
-restHandler.CreateDB();
+
+var customLevels = {
+    levels: {
+        debug: 0,
+        info: 1,
+        warn: 2,
+        error: 3
+    },
+    colors: {
+        debug: 'blue',
+        info: 'green',
+        warn: 'yellow',
+        error: 'red'
+    }
+};
+
+var logger = new(winston.Logger)({
+    level: 'debug',
+    levels: customLevels.levels,
+    transports: [
+        // setup console logging
+        new(winston.transports.Console)({
+            level: 'info', // Only write logs of info level or higher
+            levels: customLevels.levels,
+            colorize: true
+        })
+    ]
+});
+
+
+winston.addColors(customLevels.colors);
+
+
+//logger.info('Hello distributed log files!');
+//logger.error('Hello distributed log files!');
+//logger.warn('Hello distributed log files!');
+
+
+//restHandler.CreateDB();
 
 
 var server = restify.createServer({
@@ -20,6 +55,9 @@ var server = restify.createServer({
 
 server.pre(restify.pre.userAgentConnection());
 server.use(restify.bodyParser({ mapParams: false }));
+
+
+server.post('/offload', restMessageHandler.CreateCluster);
 
 /*
 server.get('/xxx/:id', function (req, res) {
@@ -37,7 +75,7 @@ server.get('/xxx/:id/getit/:here', function (req, res) {
 sre.init(server, {
         resourceName : 'swag',
         server : 'restify', // or express
-        httpMethods : ['GET', 'POST'],
+        httpMethods : ['GET', 'POST', 'PUT', 'DELETE'],
         basePath : 'http://localhost:3000',
         ignorePaths : {
             GET : ['path1', 'path2'],
