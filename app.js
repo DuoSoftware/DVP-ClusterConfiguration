@@ -5,6 +5,10 @@ var restify = require('restify');
 var sre = require('swagger-restify-express');
 var http = require('http');
 
+
+restHandler.CreateDB();
+
+
 var server = restify.createServer({
     name: "DVP Cluster Service"
 });
