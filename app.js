@@ -5,6 +5,11 @@ var restify = require('restify');
 var sre = require('swagger-restify-express');
 var http = require('http');
 
+var winston = require('winston');
+
+winston.log('info', 'Hello distributed log files!');
+winston.info('Hello again distributed logs');
+
 
 restHandler.CreateDB();
 
@@ -16,6 +21,7 @@ var server = restify.createServer({
 server.pre(restify.pre.userAgentConnection());
 server.use(restify.bodyParser({ mapParams: false }));
 
+/*
 server.get('/xxx/:id', function (req, res) {
     res.send('hello from my REST server ' + req.params.name);
 });
@@ -23,8 +29,10 @@ server.get('/xxx/:id', function (req, res) {
 server.get('/xxx/:id/getit/:here', function (req, res) {
     res.send('hello from my REST server ' + req.params.name);
 });
-
+*/
 //server.post('/offload', someClass.offload);
+
+//server.post();
 
 sre.init(server, {
         resourceName : 'swag',
