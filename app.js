@@ -57,23 +57,125 @@ server.pre(restify.pre.userAgentConnection());
 server.use(restify.bodyParser({ mapParams: false }));
 
 
-server.post('/offload', restMessageHandler.CreateCluster);
+//////////////////////////////Cloud API/////////////////////////////////////////////////////
 
-/*
-server.get('/xxx/:id', function (req, res) {
-    res.send('hello from my REST server ' + req.params.name);
+server.post('/DVP/API/:version/CloudConfiguration/Cloud', restMessageHandler.CreateCluster);
+
+server.post('/DVP/API/:version/CloudConfiguration/Cloud/:id/Activate/:status', function( req, res, next){
+
+    restMessageHandler.ActivateCloud(res,req.params.id,req.params.status);
+    return next();
 });
 
-server.get('/xxx/:id/getit/:here', function (req, res) {
-    res.send('hello from my REST server ' + req.params.name);
-});
-*/
-//server.post('/offload', someClass.offload);
 
-//server.post();
+server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res, next){
+    restMessageHandler.GetClusterByID(res, req.params.id);
+    return next();
+} );
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+//////////////////////////////CallServer API///////////////////////////////////////////////
+
+server.post('/DVP/API/:version/CloudConfiguration/CallServer', restMessageHandler.CreateCallServer);
+
+
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/Activate/:status', function( req, res, next){
+
+    restMessageHandler.ActivateCallServer(res,req.params.id,req.params.status);
+    return next();
+});
+
+
+server.get('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
+    restMessageHandler.GetCallServerByID(res, req.params.id);
+    return next();
+} );
+
+server.post('/DVP/API/:version/CloudConfiguration/Callserver/:id/AssignTo/:cloudid',function( req, res, next){
+    restMessageHandler.AddCallServerToCloud(res, req.params.id,req.params.cloudid);
+    return next();
+} );
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////Virtual cluster API///////////////////////////////////////
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Callserver/:childid/SetParent/:parentid',function( req, res, next){
+    restMessageHandler.SetParentCloud(res, req.params.childid,req.params.parentid);
+    return next();
+} );
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////LoadBalancer API////////////////////////////////////////////
+
+server.post('/DVP/API/:version/CloudConfiguration/LoadBalancer',function( req, res, next){
+    restMessageHandler.AddLoadBalancer(res, req);
+    return next();
+} );
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////Network API//////////////////////////////////////////////////////
+
+// /DVP/API/:version/CloudConfiguration/Network/TelcoNetwork/:cloudId
+// /DVP/API/:version/CloudConfiguration/Network/ClientNetwork/:cloudId
+
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Network/TelcoNetwork',function( req, res, next){
+    restMessageHandler.CreateTelcoNetwork(res, req);
+    return next();
+} );
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Network/UserNetwork',function( req, res, next){
+    restMessageHandler.CreateEndUserNetwork(res, req);
+    return next();
+} );
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToCloud/:cloudid',function( req, res, next){
+    restMessageHandler.SetTelcoNetworkToCloud(res,req.params.networkid,req.params.cloudid);
+    return next();
+} );
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',function( req, res, next){
+    restMessageHandler.SetTelcoNetworkToUSer(res,req.params.networkid,req.params.userid);
+    return next();
+} );
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+////////////////////////////////////User ////////////////////////////////////////////////////////
+
+server.post('/DVP/API/:version/CloudConfiguration/User',function( req, res, next){
+    restMessageHandler.CreateEndUser(res, req);
+    return next();
+} );
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 sre.init(server, {
-        resourceName : 'swag',
+        resourceName : 'CloudConfigurationService',
         server : 'restify', // or express
         httpMethods : ['GET', 'POST', 'PUT', 'DELETE'],
         basePath : 'http://localhost:3000',
