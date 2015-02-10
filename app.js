@@ -125,10 +125,6 @@ server.post('/DVP/API/:version/CloudConfiguration/LoadBalancer',function( req, r
 
 /////////////////////////////Network API//////////////////////////////////////////////////////
 
-// /DVP/API/:version/CloudConfiguration/Network/TelcoNetwork/:cloudId
-// /DVP/API/:version/CloudConfiguration/Network/ClientNetwork/:cloudId
-
-
 
 server.post('/DVP/API/:version/CloudConfiguration/Network/TelcoNetwork',function( req, res, next){
     restMessageHandler.CreateTelcoNetwork(res, req);
