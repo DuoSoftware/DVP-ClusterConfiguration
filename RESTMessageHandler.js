@@ -1,4 +1,5 @@
 var dbmodel = require('./DVP-DBModels');
+var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
 
 
@@ -673,7 +674,6 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
     })
 }
 
-
 function CreateEndUser(res,req)
 {
 
@@ -720,9 +720,9 @@ function CreateEndUser(res,req)
                     .save()
                     .complete(function (err) {
                         if (err) {
-                            console.log('The user instance has not been saved:', err)
+                            console.log('The user instance has not been saved:', err);
                         } else {
-                            console.log('user have a persisted instance now')
+                            console.log('user have a persisted instance now');
                             status = 1;
 
 
@@ -730,8 +730,6 @@ function CreateEndUser(res,req)
 
                                 if(!errx)
                                     status = 1;
-
-
 
                             });
 
@@ -747,7 +745,7 @@ function CreateEndUser(res,req)
                         }
                         catch (exp) {
 
-                            console.log("There is a error in --> CreateEndUser ", exp)
+                            console.log("There is a error in --> CreateEndUser ", exp);
 
                         }
                     })
@@ -776,6 +774,75 @@ function CreateEndUser(res,req)
 
 }
 
+
+function CreateSipProfile(res, req){
+
+
+    var status = 0;
+
+    if(req.body) {
+
+
+        var userData = req.body;
+        profileHandler.addSipNetworkProfile(userData,function(err, id, sta){
+
+            if(err){
+
+                console.log("obj is null in CreateEndUser");
+                res.write(status.toString());
+                res.end();
+
+            }else{
+
+                status = 1;
+                console.log("obj is null in CreateEndUser");
+                res.write(status.toString());
+                res.end();
+
+            }
+
+        });
+    }
+    else
+    {
+        console.log("obj is null in CreateEndUser");
+        res.write(status.toString());
+        res.end();
+
+    }
+
+
+
+}
+
+function AssignSipProfileToCallServer(res, profileid, callserverID){
+
+
+    var status = 0;
+
+
+        profileHandler.addNetworkProfileToCallServer(profileid,callserverID,function(err, id, sta){
+
+            if(err){
+
+                console.log("obj is null in CreateEndUser");
+                res.write(status.toString());
+                res.end();
+
+            }else{
+
+                status = 1;
+                console.log("obj is null in CreateEndUser");
+                res.write(status.toString());
+                res.end();
+
+            }
+
+        });
+
+
+};
+
 module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
@@ -790,3 +857,5 @@ module.exports.SetTelcoNetworkToCloud = SetTelcoNetworkToCloud;
 module.exports.CreateEndUserNetwork = CreateEndUserNetwork;
 module.exports.SetTelcoNetworkToUSer = SetTelcoNetworkToUSer;
 module.exports.CreateEndUser = CreateEndUser;
+module.exports.CreateSipProfile = CreateSipProfile;
+module.exports.AssignSipProfileToCallServer = AssignSipProfileToCallServer;

@@ -170,6 +170,31 @@ server.post('/DVP/API/:version/CloudConfiguration/User',function( req, res, next
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////profile////////////////////////////////////////////////////////////
+
+server.post('/DVP/API/:version/CloudConfiguration/Profile',function( req, res, next){
+    restMessageHandler.CreateSipProfile(res, req);
+    return next();
+} );
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToCallServer/:callserverid',function( req, res, next){
+    restMessageHandler.SetTelcoNetworkToCloud(res,req.params.profileid,req.params.callserverid);
+    return next();
+} );
+
+
+
+server.post('/DVP/API/:version/CloudConfiguration/Profile/:networkid/SetNetworkToEndUser/:enduser',function( req, res, next){
+    restMessageHandler.SetTelcoNetworkToUSer(res,req.params.networkid,req.params.enduser);
+    return next();
+} );
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 sre.init(server, {
         resourceName : 'CloudConfigurationService',
         server : 'restify', // or express
