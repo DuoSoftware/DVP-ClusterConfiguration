@@ -160,7 +160,7 @@ server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNet
 
 ////////////////////////////////////User ////////////////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/User',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',function( req, res, next){
     restMessageHandler.CreateEndUser(res, req);
     return next();
 } );
@@ -179,20 +179,29 @@ server.post('/DVP/API/:version/CloudConfiguration/Profile',function( req, res, n
 
 
 server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToCallServer/:callserverid',function( req, res, next){
-    restMessageHandler.SetTelcoNetworkToCloud(res,req.params.profileid,req.params.callserverid);
+    restMessageHandler.AssignSipProfileToCallServer(res,req.params.profileid,req.params.callserverid);
     return next();
 } );
 
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Profile/:networkid/SetNetworkToEndUser/:enduser',function( req, res, next){
-    restMessageHandler.SetTelcoNetworkToUSer(res,req.params.networkid,req.params.enduser);
+server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToEndUser/:enduser',function( req, res, next){
+    restMessageHandler.AssignSipProfiletoEndUser(res,req.params.profileid,req.params.enduser);
     return next();
 } );
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////StoreIPAddressDetails/////////////////////////////////////////////////////////
+
+server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res, next){
+    restMessageHandler.StoreIPAddressDetails(res, req);
+    return next();
+} );
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 sre.init(server, {

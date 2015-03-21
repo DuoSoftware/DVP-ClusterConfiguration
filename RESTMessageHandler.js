@@ -1,6 +1,16 @@
 var dbmodel = require('./DVP-DBModels');
 var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
+var config = require('config');
+var redis = require('redis');
+
+
+
+var redisClient = redis.createClient(config.Redis.port,config.Redis.ip);
+
+redisClient.on('error',function(err){
+    console.log('Error ' + err);
+});
 
 
 function GetClusterByID(res, Id) {
@@ -102,6 +112,104 @@ function CreateCluster(req, res, next) {
     }
 
     return next();
+
+}
+
+function StoreIPAddressDetails(res, req) {
+
+    var IPAddress = req.body;
+    var status = 0;
+
+
+    if (IPAddress) {
+
+        var idx = parseInt(IPAddress.CallserverID);
+        dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).complete(function (err, csInstance) {
+            try {
+
+                if (!err && csInstance) {
+
+                    var IP = dbmodel.IPAddress.build(
+                        {
+                            MainIP: IPAddress.MainIP,
+                            IP: IPAddress.IP,
+                            IsAllocated: IPAddress.IsAllocated
+                        }
+                    );
+
+
+                    IP.save()
+                        .complete(function (err) {
+
+                            if (!err) {
+                                try {
+                                    IP.setCallServer(csInstance).complete(function (errx) {
+
+
+                                        try {
+                                            if (!errx) {
+                                                status = 1;
+                                                res.write(status.toString());
+                                                res.end();
+                                            }
+                                            else {
+
+                                                console.log("Set network to callserver failed fatal error");
+                                                res.write("");
+                                                res.end();
+
+
+                                            }
+                                        }
+                                        catch(exxy) {
+
+                                        }
+
+                                    });
+                                } catch (exxxx) {
+                                    console.log("Set network to callserver failed fatal error");
+                                    res.write("");
+                                    res.end();
+
+
+                                }
+                            }
+                            else {
+
+                                console.log("error in IP save");
+                                res.write("");
+                                res.end();
+                            }
+                        });
+
+                } else {
+
+                    console.log("no callserver found");
+                    res.write("");
+                    res.end();
+                }
+
+            } catch (ex) {
+
+                console.log(ex);
+                res.write("");
+                res.end();
+
+
+            }
+
+
+        })
+
+
+    } else {
+
+        console.log("Object is invalid");
+        res.write("");
+        res.end();
+
+    }
+
 
 }
 
@@ -674,16 +782,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
     })
 }
 
-function CreateEndUser(res,req)
-{
-
-    /*
-
-     CompanyId: DataTypes.INTEGER,
-     TenantId: DataTypes.INTEGER,
-     Domain: DataTypes.STRING,
-     SIPConnectivityProvision: DataTypes.INTEGER //instance, profile, sheared
-     */
+function CreateEndUser(res,req) {
     var provision = 0;
     var status = 0;
     if(req.body){
@@ -774,7 +873,6 @@ function CreateEndUser(res,req)
 
 }
 
-
 function CreateSipProfile(res, req){
 
 
@@ -820,25 +918,117 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
     var status = 0;
 
+    dbmodel.CallServer.find({where: [{id: callserverID}, {Activate: true}]}).complete(function (err, csInstance) {
 
-        profileHandler.addNetworkProfileToCallServer(profileid,callserverID,function(err, id, sta){
+        if (!err && csInstance) {
 
-            if(err){
 
-                console.log("obj is null in CreateEndUser");
-                res.write(status.toString());
-                res.end();
+           // csInstance.getIPAddress();
 
-            }else{
 
-                status = 1;
-                console.log("obj is null in CreateEndUser");
-                res.write(status.toString());
-                res.end();
+            try {
+                //var instance = JSON.stringify(csInstance);
+
+               // res.write(instance);
+
+                profileHandler.addNetworkProfileToCallServer(profileid,callserverID,function(err, id, sta){
+
+                    if(err){
+
+                        console.log("obj is null in CreateEndUser");
+                        res.write(status.toString());
+                        res.end();
+
+                    }else{
+
+                        status = 1;
+                        console.log("Successfully bind with callserver - ");
+                        redisClient.publish("CSCOMMAND:"+csInstance.Name+":profile", JSON.stringify(profileid), redis.print);
+                        res.write(status.toString());
+                        res.end();
+
+                    }
+
+                });
+
+            } catch(exp) {
+
+                res.write("");
 
             }
 
-        });
+        } else {
+
+            res.write("");
+        }
+
+        res.end();
+
+    })
+
+
+
+
+
+
+};
+
+function AssignSipProfiletoEndUser(res, profileid, enduserID){
+
+
+    var status = 0;
+
+    dbmodel.CloudEndUser.find({where: [{id: enduserID}]}).complete(function (err, enduser) {
+
+        if (!err && enduser) {
+
+
+
+
+
+            try {
+                //var instance = JSON.stringify(csInstance);
+
+                // res.write(instance);
+
+                profileHandler.addNetworkProfiletoEndUser(profileid,enduserID,function(err, id, sta){
+
+                    if(err){
+
+                        console.log("obj is null in CreateEndUser");
+                        res.write(status.toString());
+                        res.end();
+
+                    }else{
+
+                        status = 1;
+                        console.log("Successfully bind with EndUser - ");
+                        //redisClient.publish("CSCOMMAND:"+csInstance.Name+":profile", JSON.stringify(id), redis.print);
+                        res.write(status.toString());
+                        res.end();
+
+                    }
+
+                });
+
+            } catch(exp) {
+
+                res.write("");
+
+            }
+
+        } else {
+
+            res.write("");
+        }
+
+        res.end();
+
+    })
+
+
+
+
 
 
 };
@@ -859,3 +1049,5 @@ module.exports.SetTelcoNetworkToUSer = SetTelcoNetworkToUSer;
 module.exports.CreateEndUser = CreateEndUser;
 module.exports.CreateSipProfile = CreateSipProfile;
 module.exports.AssignSipProfileToCallServer = AssignSipProfileToCallServer;
+module.exports.AssignSipProfiletoEndUser = AssignSipProfiletoEndUser;
+module.exports.StoreIPAddressDetails = StoreIPAddressDetails;
