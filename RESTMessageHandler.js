@@ -913,6 +913,30 @@ function CreateSipProfile(res, req){
 
 }
 
+function GetProfileByID(res, id){
+
+    dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).complete(function (err, profile) {
+
+        if (!err) {
+
+            try {
+                var instance = JSON.stringify(profile);
+
+                res.write(instance);
+            } catch(exp) {
+
+                res.write("");
+
+            }
+        } else {
+
+            res.write("");
+        }
+
+        res.end();
+    });
+}
+
 function AssignSipProfileToCallServer(res, profileid, callserverID){
 
 
@@ -1051,3 +1075,4 @@ module.exports.CreateSipProfile = CreateSipProfile;
 module.exports.AssignSipProfileToCallServer = AssignSipProfileToCallServer;
 module.exports.AssignSipProfiletoEndUser = AssignSipProfiletoEndUser;
 module.exports.StoreIPAddressDetails = StoreIPAddressDetails;
+module.exports.GetProfileByID = GetProfileByID;

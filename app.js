@@ -6,7 +6,10 @@ var sre = require('swagger-restify-express');
 var http = require('http');
 var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
+var request = require('request');
+//var format = require('stringformat');
 
+var port = process.env.PORT || 3000;
 
 
 var customLevels = {
@@ -190,7 +193,10 @@ server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileT
     return next();
 } );
 
-
+server.get('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
+    restMessageHandler.GetProfileByID(res, req.params.id);
+    return next();
+} );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -203,12 +209,13 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+var basepath = 'http://localhost:' + port.toString();
 
 sre.init(server, {
         resourceName : 'CloudConfigurationService',
         server : 'restify', // or express
         httpMethods : ['GET', 'POST', 'PUT', 'DELETE'],
-        basePath : 'http://localhost:3000',
+        basePath : basepath,
         ignorePaths : {
             GET : ['path1', 'path2'],
             POST : ['path1']
@@ -216,7 +223,7 @@ sre.init(server, {
     }
 )
 
-server.listen(3000, function () {
+server.listen(port, function () {
     console.log('%s listening at %s', server.name, server.url);
 });
 
