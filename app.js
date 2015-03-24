@@ -10,9 +10,9 @@ var request = require('request');
 //var format = require('stringformat');
 
 var port = process.env.PORT || 3000;
-var host = process.env.HOST || 'localhost';
+var host = config.host.domain || 'localhost';
 
-console.log(process.env);
+//console.log(process.env);
 
 
 var customLevels = {
