@@ -1,5 +1,5 @@
-var dbmodel = require('./DVP-DBModels');
-var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
+var dbmodel = require('DVP-DBModels');
+var profileHandler = require('DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
 var config = require('config');
 var redis = require('redis');
