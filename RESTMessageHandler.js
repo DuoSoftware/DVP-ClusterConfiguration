@@ -1,5 +1,5 @@
-var dbmodel = require('DVP-DBModels');
-//var profileHandler = require('DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
+var dbmodel = require('./DVP-DBModels');
+var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
 var config = require('config');
 var redis = require('redis');
@@ -876,7 +876,7 @@ function CreateEndUser(res,req) {
 function CreateSipProfile(res, req){
 
 
-    /*
+
     var status = 0;
 
     if(req.body) {
@@ -910,15 +910,12 @@ function CreateSipProfile(res, req){
 
     }
 
-    */
-
 
 
 }
 
 function GetProfileByID(res, id){
 
-    /*
     dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).complete(function (err, profile) {
 
         if (!err) {
@@ -939,13 +936,11 @@ function GetProfileByID(res, id){
 
         res.end();
     });
-
-    */
 }
 
 function AssignSipProfileToCallServer(res, profileid, callserverID){
 
-/*
+
     var status = 0;
 
     dbmodel.CallServer.find({where: [{id: callserverID}, {Activate: true}]}).complete(function (err, csInstance) {
@@ -997,7 +992,7 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
     })
 
 
-*/
+
 
 
 
@@ -1005,7 +1000,7 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
 function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
-/*
+
     var status = 0;
 
     dbmodel.CloudEndUser.find({where: [{id: enduserID}]}).complete(function (err, enduser) {
@@ -1017,6 +1012,9 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
 
             try {
+                //var instance = JSON.stringify(csInstance);
+
+                // res.write(instance);
 
                 profileHandler.addNetworkProfiletoEndUser(profileid,enduserID,function(err, id, sta){
 
@@ -1052,7 +1050,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
         res.end();
 
     })
-*/
+
 };
 
 module.exports.CreateCluster = CreateCluster;
