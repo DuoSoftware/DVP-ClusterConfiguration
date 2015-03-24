@@ -10,6 +10,9 @@ var request = require('request');
 //var format = require('stringformat');
 
 var port = process.env.PORT || 3000;
+var host = process.env.HOST || 'localhost';
+
+console.log(process.env);
 
 
 var customLevels = {
@@ -209,7 +212,7 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var basepath = 'http://localhost:' + port.toString();
+var basepath = 'http://'+ host + ':' + port.toString();
 
 sre.init(server, {
         resourceName : 'CloudConfigurationService',
