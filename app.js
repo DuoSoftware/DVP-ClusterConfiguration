@@ -215,6 +215,8 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 
 var basepath = 'http://'+ host + ':' + port.toString();
 
+//var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
+
 sre.init(server, {
         resourceName : 'CloudConfigurationService',
         server : 'restify', // or express

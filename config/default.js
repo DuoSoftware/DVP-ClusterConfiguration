@@ -11,13 +11,13 @@ module.exports = {
 
   "Redis":
   {
-    "ip": "redis.discover",
+    "ip": "localhost",
     "port": 6379
 
   },
 
   "Host":
   {
-    "domain": "duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io"
+    "domain": "localhost"
   }
 };
