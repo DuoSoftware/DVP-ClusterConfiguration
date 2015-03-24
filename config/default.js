@@ -11,7 +11,7 @@ module.exports = {
 
   "Redis":
   {
-    "ip": "127.0.0.1",
+    "ip": "redis.discoverd",
     "port": 6379
 
   }
