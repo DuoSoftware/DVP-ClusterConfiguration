@@ -1050,11 +1050,6 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
     })
 
-
-
-
-
-
 };
 
 module.exports.CreateCluster = CreateCluster;
