@@ -8,6 +8,7 @@ var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
 var request = require('request');
 //var format = require('stringformat');
+var config = require('config');
 
 var port = process.env.PORT || 3000;
 var host = config.Host.domain || 'localhost';
