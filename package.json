@@ -4,8 +4,8 @@
   "description": "",
   "main": "RESTMessageHandler.js",
   "dependencies": {
-    "DVP-Common": "git://github.com/DuoSoftware/DVP-Common.git#master",
-    "DVP-DBModels": "git://github.com/DuoSoftware/DVP-DBModels.git#master",
+    "DVP-Common": "DuoSoftware/DVP-Common",
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels",
     "config": "^1.10.0",
     "format": "^0.2.1",
     "redis": "^0.12.1",
