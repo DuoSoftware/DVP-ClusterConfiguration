@@ -1,5 +1,5 @@
-var dbmodel = require('DVP-DBModels');
-var profileHandler = require('DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
+var dbmodel = require('./DVP-DBModels');
+var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
 var config = require('config');
 var redis = require('redis');
@@ -400,7 +400,7 @@ function ActivateCallServer(res, id, activate){
     var idx = parseInt(id);
 
     var status = 0;
-    dbmodel.CallServer.find({ id: idx }).complete(function(err, csObject) {
+    dbmodel.CallServer.find({where: [{ id: idx }]}).complete(function(err, csObject) {
         if(!err && csObject) {
 
             csObject.updateAttributes({
@@ -481,7 +481,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
 
                 if (!err && cloudInstance) {
 
-                    cloudInstance.addCallServer(csInstance).complete(function (errx, cloudInstancex) {
+                    cloudInstance.addCSDB_CallServer(csInstance).complete(function (errx, cloudInstancex) {
 
                         status = 1;
                         res.write(status.toString());
