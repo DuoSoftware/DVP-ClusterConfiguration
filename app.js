@@ -51,8 +51,6 @@ winston.addColors(customLevels.colors);
 //logger.info('Hello distributed log files!');
 //logger.error('Hello distributed log files!');
 //logger.warn('Hello distributed log files!');
-
-
 //restHandler.CreateDB();
 
 

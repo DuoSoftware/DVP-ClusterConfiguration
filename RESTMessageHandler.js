@@ -1,12 +1,16 @@
-var dbmodel = require('./DVP-DBModels');
-var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
+var dbmodel = require('DVP-DBModels');
+var profileHandler = require('DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
 var config = require('config');
 var redis = require('redis');
 
 
 
-var redisClient = redis.createClient(config.Redis.port,config.Redis.ip);
+
+var redisip =config.Redis.ip;
+var redisport =config.Redis.port ;
+
+var redisClient = redis.createClient(redisport,redisip);
 
 redisClient.on('error',function(err){
     console.log('Error ' + err);
@@ -481,7 +485,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
 
                 if (!err && cloudInstance) {
 
-                    cloudInstance.addCSDB_CallServer(csInstance).complete(function (errx, cloudInstancex) {
+                    cloudInstance.addCallServer(csInstance).complete(function (errx, cloudInstancex) {
 
                         status = 1;
                         res.write(status.toString());
@@ -755,7 +759,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
 
                 if (!err && userInstance) {
 
-                    userInstance.setNetworks(networkInstance).complete(function (errx, cloudInstancex) {
+                    userInstance.setNetwork(networkInstance).complete(function (errx, cloudInstancex) {
 
                         if(!errx)
                             status = 1;
