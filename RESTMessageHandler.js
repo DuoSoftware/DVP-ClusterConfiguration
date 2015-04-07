@@ -1,5 +1,5 @@
-var dbmodel = require('DVP-DBModels');
-var profileHandler = require('DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
+var dbmodel = require('./DVP-DBModels');
+var profileHandler = require('./DVP-Common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
 var stringify = require('stringify');
 var config = require('config');
 var redis = require('redis');
@@ -972,7 +972,7 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
                         status = 1;
                         console.log("Successfully bind with callserver - ");
-                        redisClient.publish("CSCOMMAND:"+csInstance.Name+":profile", JSON.stringify(profileid), redis.print);
+                        redisClient.publish("CSCOMMAND:"+csInstance.Code+":profile", profileid, redis.print);
                         res.write(status.toString());
                         res.end();
 
