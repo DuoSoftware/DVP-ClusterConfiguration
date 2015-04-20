@@ -801,7 +801,7 @@ function CreateEndUser(res,req) {
                 if (0 < userData.Provision && userData.Provision < 4) {
 
                     console.log("provision is correct ");
-                    model = provision.Provision;
+                    provision = provision.Provision;
 
                 }
                 else {
