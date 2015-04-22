@@ -22,3 +22,5 @@ module.exports = {
         "port": "HOST_PORT"
     }
 };
+
+//NODE_CONFIG_DIR
