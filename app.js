@@ -10,7 +10,7 @@ var request = require('request');
 //var format = require('stringformat');
 var config = require('config');
 
-var port = process.env.PORT || 3000;
+var port = config.Host.port || 3000;
 var host = config.Host.domain || 'localhost';
 
 //console.log(process.env);
