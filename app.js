@@ -11,7 +11,7 @@ var request = require('request');
 var config = require('config');
 
 var port = config.Host.port || 3000;
-var host = config.Host.domain || 'localhost';
+var host = config.LBServer.ip || 'localhost';
 
 //console.log(process.env);
 

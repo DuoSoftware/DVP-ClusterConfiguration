@@ -18,6 +18,15 @@ module.exports = {
 
   "Host":
   {
-    "domain": "localhost"
+    "ip": "localhost",
+    "port": "3000",
+    "version": "1.0"
+  },
+
+  "LBServer" : {
+
+    "ip": "localhost",
+    "port": "3000"
+
   }
 };
