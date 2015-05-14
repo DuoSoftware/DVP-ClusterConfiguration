@@ -78,6 +78,13 @@ server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
     return next();
 } );
 
+
+server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, next){
+    restMessageHandler.GetClusters(req, res);
+    return next();
+} );
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -96,6 +103,12 @@ server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/Activate/:statu
 
 server.get('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
     restMessageHandler.GetCallServerByID(res, req.params.id);
+    return next();
+} );
+
+
+server.get('/DVP/API/:version/CloudConfiguration/CallServers', function( req, res, next){
+    restMessageHandler.GetCallServers(req,res);
     return next();
 } );
 
@@ -156,6 +169,16 @@ server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNet
 
 
 
+server.get('/DVP/API/:version/CloudConfiguration/Networks', function( req, res, next){
+    restMessageHandler.GetNetworks(req,res);
+    return next();
+} );
+
+
+server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', function( req, res, next){
+    restMessageHandler.GetNetworkByClusterID(req, res, req.params.id);
+    return next();
+} );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -167,6 +190,17 @@ server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNet
 
 server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',function( req, res, next){
     restMessageHandler.CreateEndUser(res, req);
+    return next();
+} );
+
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser', function( req, res, next){
+    restMessageHandler.GetEndUsers(req, res);
+    return next();
+} );
+
+
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', function( req, res, next){
+    restMessageHandler.GetEndUsersByClusterID(req, res,req.params.id);
     return next();
 } );
 
@@ -197,6 +231,12 @@ server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileT
 
 server.get('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
     restMessageHandler.GetProfileByID(res, req.params.id);
+    return next();
+} );
+
+
+server.get('/DVP/API/:version/CloudConfiguration/Profiles', function( req, res, next){
+    restMessageHandler.GetProfiles(req,res);
     return next();
 } );
 

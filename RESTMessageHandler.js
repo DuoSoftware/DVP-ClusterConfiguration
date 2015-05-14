@@ -6,8 +6,6 @@ var redis = require('redis');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 
 
-
-
 var redisip =config.Redis.ip;
 var redisport =config.Redis.port ;
 
@@ -20,7 +18,7 @@ redisClient.on('error',function(err){
 
 function GetClusterByID(res, Id) {
 
-    logger.debug("DVP-ClusterConfiguration.GetClusterByID id %d", Id);
+    logger.debug("DVP-ClusterConfiguration.GetClusterByID HTTP id %s", Id);
 
 
     dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}]}).complete(function (err, cloudInstance) {
@@ -31,19 +29,19 @@ function GetClusterByID(res, Id) {
             try {
                 var instance = JSON.stringify(cloudInstance);
 
-                logger.debug("DVP-ClusterConfiguration.GetClusterByID PGSQL id %d found %j", Id, cloudInstance);
+                logger.debug("DVP-ClusterConfiguration.GetClusterByID PGSQL id %s found %j", Id, cloudInstance);
 
                 res.write(instance);
             } catch(exp) {
 
-                logger.error("DVP-ClusterConfiguration.GetClusterByID PGSQL id %d failed", Id, exp);
+                logger.error("DVP-ClusterConfiguration.GetClusterByID stringify json failed", Id, exp);
                 res.write("");
 
             }
         } else {
 
 
-            logger.error("DVP-ClusterConfiguration.GetClusterByID Server %d failed", Id, err);
+            logger.error("DVP-ClusterConfiguration.GetClusterByID PGSQL %s failed", Id, err);
             res.write("");
         }
 
@@ -53,11 +51,48 @@ function GetClusterByID(res, Id) {
 
 }
 
+function GetClusters(req, res){
+
+
+    logger.debug("DVP-ClusterConfiguration.GetClusters HTTP");
+
+
+    dbmodel.Cloud.findAll({where: [{Activate: true}]}).complete(function (err, cloudInstance) {
+
+
+        if (!err) {
+
+            try {
+                var instance = JSON.stringify(cloudInstance);
+
+                logger.debug("DVP-ClusterConfiguration.GetClusters PGSQL  found %j", cloudInstance);
+                res.write(instance);
+            } catch(exp) {
+
+                logger.error("DVP-ClusterConfiguration.GetClusters stringify json failed",  exp);
+                res.write("");
+
+            }
+        } else {
+
+
+            logger.error("DVP-ClusterConfiguration.GetClusters PGSQL failed",  err);
+            res.write("");
+        }
+
+        res.end();
+
+    })
+
+
+
+}
+
 function CreateCluster(req, res, next) {
 
 
 
-    logger.debug("DVP-ClusterConfiguration.CreateCluster method called");
+    logger.debug("DVP-ClusterConfiguration.CreateCluster HTTP");
 
     var model = 0;
     var status = 0;
@@ -136,7 +171,7 @@ function StoreIPAddressDetails(res, req) {
     var status = 0;
 
 
-    logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails ");
+    logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails HTTP");
 
     if (IPAddress) {
 
@@ -247,7 +282,7 @@ function StoreIPAddressDetails(res, req) {
 
 function AddLoadBalancer(res, req) {
 
-    logger.debug("DVP-ClusterConfiguration.AddLoadBalancer");
+    logger.debug("DVP-ClusterConfiguration.AddLoadBalancer HTTP");
 
     var loadBalancer=req.body;
     var status = 0;
@@ -323,7 +358,7 @@ function AddLoadBalancer(res, req) {
 function ActivateCloud(res, id, activate){
 
 
-    logger.debug("DVP-ClusterConfiguration.ActivateCloud %s", id);
+    logger.debug("DVP-ClusterConfiguration.ActivateCloud HTTP %s", id);
 
     var activeStatus = activate;
 
@@ -377,7 +412,7 @@ function CreateCallServer(req, res, next) {
 
 
 
-    logger.debug("DVP-ClusterConfiguration.CreateCallServer");
+    logger.debug("DVP-ClusterConfiguration.CreateCallServer HTTP");
 
     var model = 0;
     var status = 0;
@@ -448,7 +483,7 @@ function ActivateCallServer(res, id, activate){
 
     var idx = parseInt(id);
 
-    logger.debug("DVP-ClusterConfiguration.ActivateCallServer %s", id);
+    logger.debug("DVP-ClusterConfiguration.ActivateCallServer HTTP %s ", id);
 
     var status = 0;
     dbmodel.CallServer.find({where: [{ id: idx }]}).complete(function(err, csObject) {
@@ -497,7 +532,7 @@ function ActivateCallServer(res, id, activate){
 function GetCallServerByID(res, Id) {
 
 
-    logger.debug("DVP-ClusterConfiguration.GetCallServerByID id %d", Id);
+    logger.debug("DVP-ClusterConfiguration.GetCallServerByID HTTP id %s ", Id);
 
     var idx = parseInt(Id);
     dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).complete(function (err, csInstance) {
@@ -531,10 +566,47 @@ function GetCallServerByID(res, Id) {
 
 }
 
+function GetCallServers(req, res) {
+
+
+    logger.debug("DVP-ClusterConfiguration.GetCallServers HTTP  ");
+
+    var idx = parseInt(Id);
+    dbmodel.CallServer.findAll({where: [{Activate: true}]}).complete(function (err, csInstance) {
+
+        if (!err) {
+
+
+
+            try {
+                var instance = JSON.stringify(csInstance);
+
+                logger.debug("DVP-ClusterConfiguration.GetCallServers Found %s",  instance);
+
+                res.write(instance);
+            } catch(exp) {
+
+                res.write("");
+
+            }
+
+        } else {
+
+            logger.error("DVP-ClusterConfiguration.GetCallServers Failed", err);
+
+            res.write("");
+        }
+
+        res.end();
+
+    })
+
+}
+
 function AddCallServerToCloud(res, Id, cloudID) {
 
 
-    logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud id %s to %s", Id, cloudID);
+    logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud id HTTP %s to %s", Id, cloudID);
     var status = 0;
     dbmodel.CallServer.find({where: [{id: parseInt(Id)}, {Activate: true}]}).complete(function (err, csInstance) {
 
@@ -586,7 +658,7 @@ function SetParentCloud(res, chilid, parentid) {
 
 
 
-    logger.debug("DVP-ClusterConfiguration.SetParentCloud id %s to %s", chilid, parentid);
+    logger.debug("DVP-ClusterConfiguration.SetParentCloud HTTP id %s to %s", chilid, parentid);
 
     var status = 0;
     dbmodel.Cloud.find({where: [{id: parseInt(chilid)}, {Activate: true}]}).complete(function (err, childInstance) {
@@ -637,6 +709,75 @@ function SetParentCloud(res, chilid, parentid) {
 
 }
 
+function GetNetworks(req, res){
+
+    logger.debug("DVP-ClusterConfiguration.GetNetworks HTTP");
+
+    dbmodel.Network.findAll().complete(function (err, network) {
+
+        if (!err) {
+
+
+            logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network Found %j", network);
+
+
+            try {
+                var instance = JSON.stringify(network);
+
+                res.write(instance);
+            } catch(exp) {
+
+                res.write("");
+
+            }
+        } else {
+
+            logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network NotFound",  err);
+
+
+            res.write("");
+        }
+
+        res.end();
+    });
+
+}
+
+function GetNetworkByClusterID(req, res, Id) {
+
+    logger.debug("DVP-ClusterConfiguration.GetNetworkByClusterID HTTP id %d", Id);
+
+
+    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbModel.Network, as: "Network"}]}).complete(function (err, cloudInstance) {
+
+
+        if (!err) {
+
+            try {
+                var instance = JSON.stringify(cloudInstance.Network);
+
+                logger.debug("DVP-ClusterConfiguration.GetNetworkByClusterID PGSQL id %s found %j", Id, cloudInstance.Network);
+
+                res.write(instance);
+            } catch(exp) {
+
+                logger.error("DVP-ClusterConfiguration.GetNetworkByClusterID stringify json id %s failed", Id, exp);
+                res.write("");
+
+            }
+        } else {
+
+
+            logger.error("DVP-ClusterConfiguration.GetNetworkByClusterID PGSQL %s failed", Id, err);
+            res.write("");
+        }
+
+        res.end();
+
+    })
+
+}
+
 function CreateTelcoNetwork(res, req){
 
 
@@ -656,7 +797,7 @@ function CreateTelcoNetwork(res, req){
      */
 
 
-    logger.debug("DVP-ClusterConfiguration.CreateTelcoNetwork");
+    logger.debug("DVP-ClusterConfiguration.CreateTelcoNetwork HTTP");
 
 
     var model = 0;
@@ -742,7 +883,7 @@ function CreateEndUserNetwork(res, req){
      */
 
 
-    logger.debug("DVP-ClusterConfiguration.CreateEndUserNetwork");
+    logger.debug("DVP-ClusterConfiguration.CreateEndUserNetwork HTTP");
 
 
     var model = 0;
@@ -812,7 +953,7 @@ function CreateEndUserNetwork(res, req){
 function SetTelcoNetworkToCloud(res, networkId, cloudId){
     var status = 0;
 
-    logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToCloud id %s to %s", networkId, cloudId);
+    logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToCloud HTTP id %s to %s", networkId, cloudId);
 
     dbmodel.Network.find({where: [{id:  parseInt(networkId)}]}).complete(function (err, networkInstance) {
 
@@ -862,7 +1003,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
 function SetTelcoNetworkToUSer(res, networkId, userID){
     var status = 0;
 
-    logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToUSer id %s to %s", networkId, userID);
+    logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToUSer HTTP id %s to %s", networkId, userID);
 
     dbmodel.Network.find({where: [{id: parseInt(networkId)}]}).complete(function (err, networkInstance) {
 
@@ -913,7 +1054,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
 function CreateEndUser(res,req) {
 
 
-    logger.debug("DVP-ClusterConfiguration.CreateEndUser");
+    logger.debug("DVP-ClusterConfiguration.CreateEndUser HTTP");
 
     var provision = 0;
     var status = 0;
@@ -1015,10 +1156,79 @@ function CreateEndUser(res,req) {
 
 }
 
+function GetEndUsers(req, res){
+
+
+    logger.debug("DVP-ClusterConfiguration.EndUsers HTTP");
+
+    dbmodel.CloudEndUser.findAll().complete(function (err, enduser) {
+
+        if (!err) {
+
+
+            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found %j", enduser);
+
+
+            try {
+                var instance = JSON.stringify(enduser);
+
+                res.write(instance);
+            } catch(exp) {
+
+                res.write("");
+
+            }
+        } else {
+
+            logger.debug("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound",  err);
+
+
+            res.write("");
+        }
+
+        res.end();
+    });
+}
+
+function GetEndUsersByClusterID(req, res, Id) {
+
+    logger.debug("DVP-ClusterConfiguration.GetEndUsersByClusterID HTTP id %d", Id);
+
+
+    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbModel.CloudEndUser, as: "CloudEndUser"}]}).complete(function (err, cloudInstance) {
+
+
+        if (!err) {
+
+            try {
+                var instance = JSON.stringify(cloudInstance.CloudEndUser);
+
+                logger.debug("DVP-ClusterConfiguration.GetEndUsersByClusterID PGSQL id %s found %j", Id, cloudInstance.CloudEndUser);
+
+                res.write(instance);
+            } catch(exp) {
+
+                logger.error("DVP-ClusterConfiguration.GetEndUsersByClusterID stringify json %s failed", Id, exp);
+                res.write("");
+
+            }
+        } else {
+
+
+            logger.error("DVP-ClusterConfiguration.GetEndUsersByClusterID PGSQL %s failed", Id, err);
+            res.write("");
+        }
+
+        res.end();
+
+    })
+
+}
+
 function CreateSipProfile(res, req){
 
 
-    logger.debug("DVP-ClusterConfiguration.CreateSipProfile");
+    logger.debug("DVP-ClusterConfiguration.CreateSipProfile HTTP");
 
 
     var status = 0;
@@ -1065,7 +1275,7 @@ function CreateSipProfile(res, req){
 function GetProfileByID(res, id){
 
 
-    logger.debug("DVP-ClusterConfiguration.GetProfileByID");
+    logger.debug("DVP-ClusterConfiguration.GetProfileByID HTTP");
 
     dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).complete(function (err, profile) {
 
@@ -1096,12 +1306,46 @@ function GetProfileByID(res, id){
     });
 }
 
+function GetProfiles(req, res){
+
+
+    logger.debug("DVP-ClusterConfiguration.GetProfiles HTTP");
+
+    dbmodel.SipNetworkProfile.findAll().complete(function (err, profile) {
+
+        if (!err) {
+
+
+            logger.debug("DVP-ClusterConfiguration.GetProfiles PGSQL SipProfile Found %j", profile);
+
+
+            try {
+                var instance = JSON.stringify(profile);
+
+                res.write(instance);
+            } catch(exp) {
+
+                res.write("");
+
+            }
+        } else {
+
+            logger.debug("DVP-ClusterConfiguration.GetProfiles PGSQL SipProfile NotFound",  err);
+
+
+            res.write("");
+        }
+
+        res.end();
+    });
+}
+
 function AssignSipProfileToCallServer(res, profileid, callserverID){
 
 
     var status = 0;
 
-    logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer");
+    logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer HTTP");
 
     dbmodel.CallServer.find({where: [{id: callserverID}, {Activate: true}]}).complete(function (err, csInstance) {
 
@@ -1162,7 +1406,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
 
 
-    logger.debug("DVP-ClusterConfiguration.AssignSipProfiletoEndUser");
+    logger.debug("DVP-ClusterConfiguration.AssignSipProfiletoEndUser HTTP");
 
     var status = 0;
 
@@ -1219,6 +1463,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
+module.exports.GetClusters = GetClusters;
 module.exports.ActivateCloud = ActivateCloud;
 module.exports.CreateCallServer = CreateCallServer;
 module.exports.ActivateCallServer = ActivateCallServer;
@@ -1229,9 +1474,15 @@ module.exports.CreateTelcoNetwork = CreateTelcoNetwork;
 module.exports.SetTelcoNetworkToCloud = SetTelcoNetworkToCloud;
 module.exports.CreateEndUserNetwork = CreateEndUserNetwork;
 module.exports.SetTelcoNetworkToUSer = SetTelcoNetworkToUSer;
+module.exports.GetNetworks = GetNetworks;
 module.exports.CreateEndUser = CreateEndUser;
+module.exports.GetEndUsers = GetEndUsers;
 module.exports.CreateSipProfile = CreateSipProfile;
 module.exports.AssignSipProfileToCallServer = AssignSipProfileToCallServer;
 module.exports.AssignSipProfiletoEndUser = AssignSipProfiletoEndUser;
 module.exports.StoreIPAddressDetails = StoreIPAddressDetails;
 module.exports.GetProfileByID = GetProfileByID;
+module.exports.GetCallServers = GetCallServers;
+module.exports.GetProfiles = GetProfiles;
+module.exports.GetNetworkByClusterID =GetNetworkByClusterID;
+module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
