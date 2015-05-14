@@ -9,13 +9,13 @@ var restMessageHandler = require('./RESTMessageHandler.js');
 var request = require('request');
 //var format = require('stringformat');
 var config = require('config');
-
+var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
 var host = config.LBServer.ip || 'localhost';
 
 //console.log(process.env);
 
-
+/*
 var customLevels = {
     levels: {
         debug: 0,
@@ -52,7 +52,7 @@ winston.addColors(customLevels.colors);
 //logger.error('Hello distributed log files!');
 //logger.warn('Hello distributed log files!');
 //restHandler.CreateDB();
-
+*/
 
 var server = restify.createServer({
     name: "DVP Cluster Service"
@@ -110,7 +110,7 @@ server.post('/DVP/API/:version/CloudConfiguration/Callserver/:id/AssignTo/:cloud
 /////////////////////////////////Virtual cluster API///////////////////////////////////////
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Callserver/:childid/SetParent/:parentid',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:parentid',function( req, res, next){
     restMessageHandler.SetParentCloud(res, req.params.childid,req.params.parentid);
     return next();
 } );
@@ -228,7 +228,11 @@ sre.init(server, {
 )
 
 server.listen(port, function () {
-    console.log('%s listening at %s', server.name, server.url);
+
+
+
+    logger.info("DVP-ClusterConfiguration.main Server %s listening at %s", server.name, server.url);
+    //console.log('%s listening at %s', server.name, server.url);
 });
 
 
