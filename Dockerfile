@@ -1,4 +1,3 @@
-
 # VERSION 0.2
 # DOCKER-VERSION 0.3.4
 # To build:
@@ -19,5 +18,6 @@ RUN     cd /usr/local/src; git clone -b Development git://github.com/DuoSoftware
 # Install app dependencies
 RUN cd usr/local/src/DVP-ClusterConfiguration; npm install
 
-EXPOSE  8080
+
 CMD ["nodejs", "app.js"]
+
