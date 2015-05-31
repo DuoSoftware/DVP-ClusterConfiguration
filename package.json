@@ -1,21 +1,33 @@
 {
   "name": "DVP-ClusterConfiguration",
-  "version": "0.0.1",
+  "version": "0.0.0",
+  "description": "",
+  "main": "RESTMessageHandler.js",
   "dependencies": {
-    "restify": "^2.8.5"
-    "swagger-restify-express": "~0.2.1"
+    "DVP-Common": "DuoSoftware/DVP-Common",
+    "DVP-DBModels": "DuoSoftware/DVP-DBModels",
+    "config": "^1.10.0",
+    "format": "^0.2.1",
+    "redis": "^0.12.1",
+    "request": "^2.53.0",
+    "restify": "^2.8.5",
+    "should": "^4.6.2",
+    "string": "^3.0.1",
+    "stringify": "^3.1.0",
+    "swagger-restify-express": "^0.2.1",
+    "winston": "^0.8.3"
   },
-  "description": "Cluster Configuration for DVP",
-  "main": "app.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^2.1.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/DuoSoftware/DVP-ClusterConfiguration.git"
   },
-  "author": "Sukitha Jayasingha",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/DuoSoftware/DVP-ClusterConfiguration/issues"
