@@ -1,11 +1,11 @@
 module.exports = {
     "DB": {
-        "Type":"SYS_DB_TYPE",
-        "User":"SYS_DB_USER",
-        "Password":"SYS_DB_PASSWORD",
+        "Type":"SYS_DATABASE_TYPE",
+        "User":"SYS_DATABASE_POSTGRES_USER",
+        "Password":"SYS_DATABASE_POSTGRES_PASSWORD",
         "Port":"SYS_SQL_PORT",
-        "Host":"SYS_DB_HOST",
-        "Database":"SYS_DB_USER"
+        "Host":"SYS_DATABASE_HOST",
+        "Database":"SYS_DATABASE_POSTGRES_USER"
     },
 
 

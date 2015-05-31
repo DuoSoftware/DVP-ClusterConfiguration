@@ -19,5 +19,5 @@ RUN     cd /usr/local/src; git clone git://github.com/DuoSoftware/DVP-ClusterCon
 RUN cd usr/local/src/DVP-ClusterConfiguration; npm install
 
 
-CMD ["nodejs", "app.js"]
+CMD ["nodejs", "usr/local/src/DVP-ClusterConfiguration/app.js"]
 
