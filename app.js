@@ -193,7 +193,7 @@ server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',function( req, r
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', function( req, res, next){
     restMessageHandler.GetEndUsers(req, res);
     return next();
 } );
