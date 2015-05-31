@@ -11,7 +11,7 @@ var request = require('request');
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
-var host = config.LBServer.ip || 'localhost';
+var host = config.Host.vdomain || 'localhost';
 
 //console.log(process.env);
 
@@ -251,7 +251,7 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var basepath = 'http://'+ host + ':' + port.toString();
+var basepath = 'http://'+ host;
 
 //var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
 
