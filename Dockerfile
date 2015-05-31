@@ -12,7 +12,7 @@ RUN apt-get update
 #RUN     rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-8.noarch.rpm
 # Install Node.js and npm
 RUN     apt-get install -y git nodejs npm
-RUN     cd /usr/local/src; git clone -b Development git://github.com/DuoSoftware/DVP-ClusterConfiguration.git
+RUN     cd /usr/local/src; git clone git://github.com/DuoSoftware/DVP-ClusterConfiguration.git
 # App
 #ADD . /src
 # Install app dependencies
