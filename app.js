@@ -6,7 +6,6 @@ var sre = require('swagger-restify-express');
 var http = require('http');
 var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
-var request = require('request');
 //var format = require('stringformat');
 var config = require('config');
 var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
@@ -251,8 +250,8 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var basepath = 'http://'+ host;
-
+//var basepath = 'http://'+ host;
+var basepath = 'http://'+ "localhost"+":"+port;
 //var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
 
 sre.init(server, {
