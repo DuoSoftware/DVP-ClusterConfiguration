@@ -513,7 +513,7 @@ function CreateCallServer(req, res, next) {
 function ActivateCallServer(res, id, activate){
 
 
-    var activeStatus = activate;
+    var activeStatus = bool.parse(activate);
 
     var idx = parseInt(id);
     var outerror = undefined;
