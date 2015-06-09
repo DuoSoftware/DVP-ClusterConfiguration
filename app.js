@@ -2,7 +2,7 @@
  * Created by a on 1/27/2015.
  */
 var restify = require('restify');
-//var sre = require('swagger-restify-express');
+var sre = require('swagger-restify-express');
 var http = require('http');
 var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
@@ -18,7 +18,7 @@ var host = config.Host.vdomain || 'localhost';
 var customLevels = {
     levels: {
         debug: 0,
-        info: 1,
+        info: 1,calc
         warn: 2,
         error: 3
     },
@@ -249,7 +249,7 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 } );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
+
 //var basepath = 'http://'+ host;
 var basepath = 'http://'+ "localhost"+":"+port;
 //var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
@@ -264,7 +264,7 @@ sre.init(server, {
             POST : ['path1']
         }
     }
-)*/
+)
 
 server.listen(port, function () {
 
