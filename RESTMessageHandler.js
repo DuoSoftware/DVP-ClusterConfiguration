@@ -387,7 +387,7 @@ function ActivateCloud(res, id, activate){
 
     logger.debug("DVP-ClusterConfiguration.ActivateCloud HTTP %s", id);
 
-    var activeStatus = activate;
+    var activeStatus = bool.parse( activate);
 
     var status = false;
     var idx = parseInt(id);
