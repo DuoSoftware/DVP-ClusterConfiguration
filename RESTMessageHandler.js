@@ -395,7 +395,7 @@ function ActivateCloud(res, id, activate){
     dbmodel.Cloud.find({ ID: idx }).complete(function(err, cloudObject) {
         if(!err && cloudObject) {
 
-            logger.debug("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Found", cloudObject);
+            logger.debug("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Found");
 
 
             cloudObject.updateAttributes({
