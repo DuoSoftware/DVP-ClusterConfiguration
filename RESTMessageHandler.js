@@ -387,7 +387,7 @@ function ActivateCloud(res, id, activate){
 
     logger.debug("DVP-ClusterConfiguration.ActivateCloud HTTP %s", id);
 
-    var activeStatus = Boolean( activate);
+    var activeStatus = (activate === 'true');
 
     var status = false;
     var idx = parseInt(id);
@@ -513,7 +513,7 @@ function CreateCallServer(req, res, next) {
 function ActivateCallServer(res, id, activate){
 
 
-    var activeStatus = Boolean(activate);
+    var activeStatus = (activate === 'true');
 
     var idx = parseInt(id);
     var outerror = undefined;
@@ -1132,7 +1132,7 @@ function CreateEndUser(res,req) {
 
         var userData=req.body;
 
-        dbmodel.Cloud.find({where: [{ id: userData.clusterID}, {Activate: true}]}).complete(function(err, cloudObject) {
+        dbmodel.Cloud.find({where: [{ id: userData.ClusterID}, {Activate: true}]}).complete(function(err, cloudObject) {
             if(!err && cloudObject) {
 
 
@@ -1143,7 +1143,7 @@ function CreateEndUser(res,req) {
                 if (0 < userData.Provision && userData.Provision < 4) {
 
                     logger.debug("DVP-ClusterConfiguration.CreateEndUser CloudEnduser Provision data correct");
-                    provision = provision.Provision;
+                    provision = userData.Provision;
 
                 }
                 else {
@@ -1167,7 +1167,7 @@ function CreateEndUser(res,req) {
                         if (err) {
                             logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL CloudEnduser Save Failed ", err);
                         } else {
-                            logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser object saved successful', user);
+                            logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser object saved successful');
                             status = true;
 
 
