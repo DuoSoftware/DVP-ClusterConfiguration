@@ -392,7 +392,7 @@ function ActivateCloud(res, id, activate){
     var status = false;
     var idx = parseInt(id);
     var outerror = undefined;
-    dbmodel.Cloud.find({where:{ ID: idx }}).complete(function(err, cloudObject) {
+    dbmodel.Cloud.find({where:{ id: idx }}).complete(function(err, cloudObject) {
         if(!err && cloudObject) {
 
             logger.debug("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Found");
