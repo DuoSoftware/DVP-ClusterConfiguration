@@ -111,7 +111,7 @@ server.get('/DVP/API/:version/CloudConfiguration/CallServers', function( req, re
     return next();
 } );
 
-server.post('/DVP/API/:version/CloudConfiguration/Callserver/:id/AssignTo/:cloudid',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudid',function( req, res, next){
     restMessageHandler.AddCallServerToCloud(res, req.params.id,req.params.cloudid);
     return next();
 } );
