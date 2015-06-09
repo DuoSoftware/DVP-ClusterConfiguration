@@ -476,7 +476,7 @@ function CreateCallServer(req, res, next) {
                     logger.error("DVP-ClusterConfiguration.CreateCallServer PGSQL CallServer Save Failed ", err);
 
                 } else {
-                    logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful', callserver);
+                    logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful');
                     status = true;
                 }
 
@@ -524,7 +524,7 @@ function ActivateCallServer(res, id, activate){
     dbmodel.CallServer.find({where: [{ id: idx }]}).complete(function(err, csObject) {
         if(!err && csObject) {
 
-            logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer Found", csObject);
+            logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer Found");
 
             csObject.updateAttributes({
 
@@ -583,7 +583,7 @@ function GetCallServerByID(res, Id) {
                 var instance = msg.FormatMessage(undefined, "Get callserver by ID", true, csInstance);
                 res.write(instance);
 
-                logger.debug("DVP-ClusterConfiguration.GetCallServerByID id %d Found %s", Id, instance);
+                logger.debug("DVP-ClusterConfiguration.GetCallServerByID id %d Found", Id);
 
 
             } catch(exp) {
@@ -621,7 +621,7 @@ function GetCallServers(req, res) {
             try {
 
 
-                logger.debug("DVP-ClusterConfiguration.GetCallServers Found %s",  instance);
+                logger.debug("DVP-ClusterConfiguration.GetCallServers Found");
 
                 var instance = msg.FormatMessage(undefined, "Get callservers", true, csInstance);
                 res.write(instance);
@@ -769,7 +769,7 @@ function GetNetworks(req, res){
         if (!err) {
 
 
-            logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network Found", network);
+            logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network Found");
 
 
             try {
