@@ -190,7 +190,7 @@ function StoreIPAddressDetails(res, req) {
 
     if (IPAddress) {
 
-        logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails Model validated", IPAddress);
+        logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails Model validated ", IPAddress);
 
         var idx = parseInt(IPAddress.CallserverID);
         dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).complete(function (err, csInstance) {
@@ -206,7 +206,7 @@ function StoreIPAddressDetails(res, req) {
                         }
                     );
 
-                    logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer Found", csInstance);
+                    logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer Found");
 
 
 
@@ -216,7 +216,7 @@ function StoreIPAddressDetails(res, req) {
                             if (!err) {
 
 
-                                logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved", IP);
+                                logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved");
 
                                 try {
                                     IP.setCallServer(csInstance).complete(function (errx) {
@@ -1136,7 +1136,7 @@ function CreateEndUser(res,req) {
             if(!err && cloudObject) {
 
 
-                logger.debug("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d Found", userData.clusterID);
+                logger.debug("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d Found", userData.ClusterID);
 
                 console.log(cloudObject)
 
