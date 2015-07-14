@@ -64,6 +64,7 @@ restify.CORS.ALLOW_HEADERS.push('api_key');
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 
+
 //////////////////////////////Cloud API/////////////////////////////////////////////////////
 
 server.post('/DVP/API/:version/CloudConfiguration/Cloud', restMessageHandler.CreateCluster);
