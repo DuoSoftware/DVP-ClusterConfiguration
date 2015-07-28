@@ -1,6 +1,6 @@
 module.exports = function(sequelize, DataTypes)
 {
-    var DidNumber = sequelize.define('DidNumber',
+    var DidNumber = sequelize.define('CSDB_DidNumber',
         {
             DidNumber: DataTypes.STRING,
             DidActive: DataTypes.BOOLEAN,
