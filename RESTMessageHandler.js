@@ -200,7 +200,7 @@ function StoreIPAddressDetails(res, req) {
 
                     var IP = dbmodel.IPAddress.build(
                         {
-                            MainIP: IPAddress.MainIP,
+                            MainIp: IPAddress.MainIP,
                             IP: IPAddress.IP,
                             IsAllocated: IPAddress.IsAllocated
                         }
