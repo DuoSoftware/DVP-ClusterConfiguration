@@ -6,7 +6,16 @@ module.exports = function(sequelize, DataTypes) {
             TenantId: DataTypes.INTEGER,
             ObjClass: DataTypes.STRING,
             ObjType: DataTypes.STRING,
-            ObjCategory: DataTypes.STRING
+            ObjCategory: DataTypes.STRING,
+            Pin:DataTypes.STRING,
+            AllowAnonymousUser:DataTypes.BOOLEAN,
+            StartTime:DataTypes.DATE,
+            EndTime:DataTypes.DATE,
+            Domain:DataTypes.STRING,
+            IsLocked:DataTypes.BOOLEAN,
+            MaxUser:DataTypes.INTEGER,
+            CurrentUsers: DataTypes.INTEGER
+
         }
     );
 

@@ -6,7 +6,8 @@ module.exports = function(sequelize, DataTypes) {
             ObjCategory: DataTypes.STRING, //INBOUND, OUTBOUND, BOTH, FAX
             Enable: DataTypes.BOOLEAN,
             CompanyId: DataTypes.INTEGER,
-            TenantId: DataTypes.INTEGER
+            TenantId: DataTypes.INTEGER,
+            FaxType: DataTypes.STRING
         }
     );
 
