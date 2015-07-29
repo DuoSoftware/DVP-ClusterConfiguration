@@ -262,7 +262,7 @@ function StoreIPAddressDetails(res, req) {
                             }
                             else {
 
-                                logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved Failed",exxxx);
+                                logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved Failed",err);
                                 var instance = msg.FormatMessage(exxxx,"Store IPAddress", status,undefined);
                                 res.write(instance);
                                 res.end();
