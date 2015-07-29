@@ -60,7 +60,7 @@ var server = restify.createServer({
 server.pre(restify.pre.userAgentConnection());
 server.use(restify.bodyParser({ mapParams: false }));
 
-restify.CORS.ALLOW_HEADERS.push('api_key');
+restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 
