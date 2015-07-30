@@ -78,6 +78,8 @@ function GetClusters(req, res){
             } catch(exp) {
 
                 logger.error("DVP-ClusterConfiguration.GetClusters stringify json failed",  exp);
+
+
                 res.write("");
 
             }
@@ -1241,6 +1243,7 @@ function GetEndUsers(req, res){
             try {
                 var instance = msg.FormatMessage(undefined, "Get EndUser", true, enduser);
                 res.write(instance);
+                res.end();
             } catch(exp) {
 
 
@@ -1253,9 +1256,10 @@ function GetEndUsers(req, res){
 
             var instance = msg.FormatMessage(err, "Get EndUser failed", false, undefined);
             res.write(instance);
+            res.end();
         }
 
-        res.end();
+
     });
 }
 
@@ -1288,15 +1292,17 @@ function GetEndUsersByClusterID(req, res, Id) {
             }
 
             res.write(instanceout);
+            res.end();
 
         } else {
 
 
             var instanceout = msg.FormatMessage(err, "Get EndUser by CloudID failed", false, undefined);
             res.write(instanceout);
+            res.end();
         }
 
-        res.end();
+
 
     })
 
@@ -1368,6 +1374,7 @@ function GetProfileByID(res, id){
             try {
                 var instance = msg.FormatMessage(undefined, "Get Profile ByID", true, profile);
                 res.write(instance);
+                res.end();
             } catch(exp) {
 
                 //res.write("");
@@ -1380,9 +1387,10 @@ function GetProfileByID(res, id){
 
             var instance = msg.FormatMessage(err, "Get Profile ByID failed", false, undefined);
             res.write(instance);
+            res.end();
         }
 
-        res.end();
+
     });
 }
 
@@ -1402,6 +1410,7 @@ function GetProfiles(req, res){
             try {
                 var instance = msg.FormatMessage(undefined, "Get Profiles", true, profile);
                 res.write(instance);
+                res.end();
             } catch(exp) {
 
                 //res.write("");
@@ -1414,9 +1423,10 @@ function GetProfiles(req, res){
 
             var instance = msg.FormatMessage(err, "Get Profiles failed", true, undefined);
             res.write(instance);
+            res.end();
         }
 
-        res.end();
+
     });
 }
 
@@ -1466,6 +1476,7 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
                 var instance = msg.FormatMessage(undefined, "Assign SipProfile To CallServer", status, undefined);
                 res.write(instance);
+                res.end();
 
             }
 
@@ -1473,9 +1484,10 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
             var instance = msg.FormatMessage(err, "Assign SipProfile To CallServer", status, undefined);
             res.write(instance);
+            res.end();
         }
 
-        res.end();
+
 
     })
 
@@ -1533,6 +1545,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
                 var instance = msg.FormatMessage(exp, "Assign SipProfile to EndUser", status, undefined);
                 res.write(instance);
+                res.end();
 
             }
 
@@ -1540,9 +1553,10 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
             var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
             res.write(instance);
+            res.end();
         }
 
-        res.end();
+
 
     })
 
