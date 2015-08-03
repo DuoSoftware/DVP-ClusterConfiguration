@@ -12,6 +12,10 @@ var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
 var host = config.Host.vdomain || 'localhost';
 
+
+
+
+
 //console.log(process.env);
 
 /*
