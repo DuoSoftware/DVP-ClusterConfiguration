@@ -2,7 +2,7 @@
   "name": "DVP-ClusterConfiguration",
   "version": "0.0.0",
   "description": "Cluster configuration for duo voice platform deployment",
-  "main": "RESTMessageHandler.js",
+  "main": "app.js",
   "dependencies": {
     "DVP-Common": "DuoSoftware/DVP-Common",
     "DVP-DBModels": "DuoSoftware/DVP-DBModels",
