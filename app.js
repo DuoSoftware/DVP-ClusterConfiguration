@@ -8,7 +8,7 @@ var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
 //var format = require('stringformat');
 var config = require('config');
-var logger = require('DVP-Common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
 var host = config.Host.vdomain || 'localhost';
 
