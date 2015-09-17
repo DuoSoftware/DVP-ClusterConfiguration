@@ -5,7 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "dvp-common": "0.0.0",
-    "dvp-dbmodels": "0.0.0",
+    "dvp-dbmodels": "0.0.1",
     "redis": "^0.12.1",
     "stringify": "^3.1.0",
     "config": "^1.13.0",
