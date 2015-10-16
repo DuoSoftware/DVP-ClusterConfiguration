@@ -20,13 +20,13 @@ module.exports = {
     {
         "vdomain": "VIRTUAL_HOST",
         "domain": "HOST_NAME",
-        "port": "HOST_CLUSTER_PORT",
+        "port": "HOST_CLUSTERCONFIGURATION_PORT",
         "version": "HOST_VERSION"
     },
 
     "LBServer" : {
 
-        "ip": "LB_IP",
+        "ip": "LB_FRONTEND",
         "port": "LB_PORT"
 
     }
