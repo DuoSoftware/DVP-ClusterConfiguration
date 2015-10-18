@@ -4,7 +4,7 @@
   "description": "Cluster configuration for duo voice platform deployment",
   "main": "app.js",
   "dependencies": {
-    "dvp-common": "^0.0.3",
+    "dvp-common": "^0.0.4",
     "dvp-dbmodels": "^0.0.20",
     "redis": "^0.12.1",
     "stringify": "^3.1.0",
