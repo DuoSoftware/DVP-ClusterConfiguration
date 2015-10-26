@@ -1735,9 +1735,6 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
         if (enduser) {
 
 
-
-
-
             try {
                 //var instance = JSON.stringify(csInstance);
 
