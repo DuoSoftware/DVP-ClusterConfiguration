@@ -1854,7 +1854,7 @@ function GetCallServersForCompany(req, res)
                             {
                                 //find call server that matches profile
                                 dbmodel.SipNetworkProfile
-                                    .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                    .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbmodel.CallServer, as: "CallServer"}]})
                                     .then(function (res)
                                     {
                                         if(res)
@@ -1900,7 +1900,7 @@ function GetCallServersForCompany(req, res)
                                     var clusId = endUser.ClusterId;
 
                                     dbmodel.Cloud
-                                        .find({where :[{id: clusId}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                        .find({where :[{id: clusId}], include : [{model: dbmodel.CallServer, as: "CallServer"}]})
                                         .then(function (clusterInfo)
                                         {
                                             if(clusterInfo)
