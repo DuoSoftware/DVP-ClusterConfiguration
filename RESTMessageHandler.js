@@ -1792,6 +1792,200 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
 };
 
+function GetCallServersForCompany(req, res)
+{
+    var tempEmptyArr = [];
+    try
+    {
+        var securityToken = req.header('authorization');
+
+        var splitArr = securityToken.split('#');
+
+        if(splitArr.length == 2)
+        {
+            var companyId = splitArr[1];
+            var tenantId = splitArr[0];
+
+            dbModel.CloudEndUser
+                .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
+                .then(function (endUser)
+                {
+                    if(endUser && endUser.SIPConnectivityProvision)
+                    {
+                        logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud end user query success');
+                        var provisionMechanism = endUser.SIPConnectivityProvision;
+
+                        switch(provisionMechanism)
+                        {
+                            case 1:
+                            {
+                                //find call server
+                                dbModel.CallServer
+                                    .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
+                                    .then(function (cs)
+                                    {
+                                        if(cs)
+                                        {
+                                            logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query success');
+                                            //call server found
+                                            tempEmptyArr.push(cs);
+                                            var respJson = msg.FormatMessage(undefined, "Call Server Found", true, tempEmptyArr);
+                                            res.write(respJson);
+                                            res.end();
+
+                                        }
+                                        else
+                                        {
+                                            logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query success');
+
+                                            var respJson = msg.FormatMessage(undefined, "Call Server Not Found", true, tempEmptyArr);
+                                            res.write(respJson);
+                                            res.end();
+                                        }
+
+                                    }).catch(function(err)
+                                    {
+                                        logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query failed', err);
+
+                                        var respJson = msg.FormatMessage(err, "Error occurred", false, tempEmptyArr);
+                                        res.write(respJson);
+                                        res.end();
+                                    });
+                            }
+                                break;
+                            case 2:
+                            {
+                                //find call server that matches profile
+                                dbModel.SipNetworkProfile
+                                    .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                    .then(function (res)
+                                    {
+                                        if(res)
+                                        {
+                                            logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query success');
+                                            if(res.CallServer)
+                                            {
+                                                tempEmptyArr.push(res.CallServer);
+                                                var respJson = msg.FormatMessage(undefined, "Call Server Found", true, tempEmptyArr);
+                                                res.write(respJson);
+                                                res.end();
+                                            }
+                                            else
+                                            {
+                                                var respJson = msg.FormatMessage(new Error('call server not connected to sip profile'), "Call Server Not Found", false, tempEmptyArr);
+                                                res.write(respJson);
+                                                res.end();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var respJson = msg.FormatMessage(new Error('Cannot find a sip network profile'), "Call Server Not Found", false, tempEmptyArr);
+                                            res.write(respJson);
+                                            res.end();
+                                        }
+
+
+                                    }).catch(function(err)
+                                    {
+                                        logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query failed', err);
+                                        var respJson = msg.FormatMessage(err, "Error occurred", false, tempEmptyArr);
+                                        res.write(respJson);
+                                        res.end();
+                                    });
+                                break;
+                            }
+                            case 3:
+                            {
+                                //find cloud code that belongs to cloud end user
+
+                                if(endUser.ClusterId)
+                                {
+                                    var clusId = endUser.ClusterId;
+
+                                    dbModel.Cloud
+                                        .find({where :[{id: clusId}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
+                                        .then(function (clusterInfo)
+                                        {
+                                            if(clusterInfo)
+                                            {
+                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query success');
+
+                                                var respJson = msg.FormatMessage(undefined, "Call Server Found", true, clusterInfo.CallServer);
+                                                res.write(respJson);
+                                                res.end();
+                                            }
+                                            else
+                                            {
+                                                logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query success');
+                                                var respJson = msg.FormatMessage(undefined, "Call Server Found", true, tempEmptyArr);
+                                                res.write(respJson);
+                                                res.end();
+                                            }
+
+                                        }).catch(function(err)
+                                        {
+                                            logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud query failed', err);
+                                            var respJson = msg.FormatMessage(err, "Error occurred", false, tempEmptyArr);
+                                            res.write(respJson);
+                                            res.end();
+                                        });
+
+                                }
+                                else
+                                {
+                                    var respJson = msg.FormatMessage(new Error('Cluster Id not set'), "Call Servers Not Found", false, tempEmptyArr);
+                                    res.write(respJson);
+                                    res.end();
+                                }
+                                break;
+
+                            }
+                            default:
+                            {
+
+                                var respJson = msg.FormatMessage(new Error('Invalid provision mechanism'), "Call Servers Not Found", false, tempEmptyArr);
+                                res.write(respJson);
+                                res.end();
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud end user query success');
+
+                        var respJson = msg.FormatMessage(new Error('Cloud Enduser not found'), "Call Servers Not Found", false, tempEmptyArr);
+                        res.write(respJson);
+                        res.end();
+                    }
+
+                }).catch(function(err)
+                {
+                    logger.error('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get cloud end user query failed', err);
+                    var respJson = msg.FormatMessage(err, "Error occurred", false, tempEmptyArr);
+                    res.write(respJson);
+                    res.end();
+                });
+
+        }
+        else
+        {
+            var respJson = msg.FormatMessage(new Error('No Auth Header Found'), "No auth header found", false, tempEmptyArr);
+            res.write(respJson);
+            res.end();
+        }
+
+
+    }
+    catch(ex)
+    {
+        var respJson = msg.FormatMessage(ex, "Error occurred", false, tempEmptyArr);
+        res.write(respJson);
+        res.end();
+
+    }
+}
+
 module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
@@ -1818,3 +2012,4 @@ module.exports.GetCallServers = GetCallServers;
 module.exports.GetProfiles = GetProfiles;
 module.exports.GetNetworkByClusterID =GetNetworkByClusterID;
 module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
+module.exports.GetCallServersForCompany = GetCallServersForCompany;

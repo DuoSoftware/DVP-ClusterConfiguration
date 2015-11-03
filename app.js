@@ -124,6 +124,12 @@ server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloud
     return next();
 } );
 
+server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',function(req, res, next)
+{
+    restMessageHandler.GetCallServersForCompany(req, res);
+    return next();
+} );
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -134,6 +140,8 @@ server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:pare
     restMessageHandler.SetParentCloud(res, req.params.childid,req.params.parentid);
     return next();
 } );
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
