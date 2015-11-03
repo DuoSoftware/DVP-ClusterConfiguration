@@ -18,7 +18,7 @@ module.exports = {
 
     "Host":
     {
-        "vdomain": "VIRTUAL_HOST",
+        "vdomain": "LB_FRONTEND",
         "domain": "HOST_NAME",
         "port": "HOST_CLUSTERCONFIGURATION_PORT",
         "version": "HOST_VERSION"
