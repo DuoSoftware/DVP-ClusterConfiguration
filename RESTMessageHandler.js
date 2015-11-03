@@ -1803,7 +1803,7 @@ function GetCallServersForCompany(req, res)
             var companyId = splitArr[1];
             var tenantId = splitArr[0];
 
-            dbModel.CloudEndUser
+            dbmodel.CloudEndUser
                 .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
                 .then(function (endUser)
                 {
@@ -1817,7 +1817,7 @@ function GetCallServersForCompany(req, res)
                             case 1:
                             {
                                 //find call server
-                                dbModel.CallServer
+                                dbmodel.CallServer
                                     .find({where :[{CompanyId: companyId}, {TenantId: tenantId}]})
                                     .then(function (cs)
                                     {
@@ -1853,7 +1853,7 @@ function GetCallServersForCompany(req, res)
                             case 2:
                             {
                                 //find call server that matches profile
-                                dbModel.SipNetworkProfile
+                                dbmodel.SipNetworkProfile
                                     .find({where :[{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
                                     .then(function (res)
                                     {
@@ -1899,7 +1899,7 @@ function GetCallServersForCompany(req, res)
                                 {
                                     var clusId = endUser.ClusterId;
 
-                                    dbModel.Cloud
+                                    dbmodel.Cloud
                                         .find({where :[{id: clusId}], include : [{model: dbModel.CallServer, as: "CallServer"}]})
                                         .then(function (clusterInfo)
                                         {
