@@ -102,6 +102,112 @@ function GetClusters(req, res){
 
 }
 
+function EditCluster(Id, req, res, next){
+
+
+    logger.debug("DVP-ClusterConfiguration.EditCluster HTTP");
+
+    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}]}).then(function (cloudInstance) {
+
+
+        try {
+
+
+            logger.debug("DVP-ClusterConfiguration.EditCluster PGSQL id %s found", Id);
+
+
+
+            var model = 0;
+            var status = false;
+            var returnerror= undefined;
+
+            if(req.body && cloudInstance){
+
+
+                var cloudData=req.body;
+
+
+                cloudInstance.updateAttributes({
+                        Name: cloudData.Name,
+                        CompanyId: cloudData.CompanyId,
+                        TenantId: cloudData.TenantId,
+                        CloudModel: model,
+                        Class: cloudData.Class,
+                        Type: cloudData.Type,
+                        Category: cloudData.Category
+
+                    }).then(function(inst) {
+
+
+
+
+                        logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful', model);
+                        status = true;
+
+                        try {
+
+
+                            var instance = msg.FormatMessage(returnerror,"Cluster updating", status,undefined);
+                            res.write(instance);
+                            res.end();
+
+
+                        }
+                        catch(exp){
+
+                            logger.error('DVP-ClusterConfiguration.EditCluster Update failed ', exp);
+
+                        }
+                    }).catch(function (err){
+
+
+                        logger.error("DVP-ClusterConfiguration.EditCluster PGSQL Update failed ",err);
+                        returnerror = err;
+                        var instance = msg.FormatMessage(returnerror,"Cluster Update", status,undefined);
+                        res.write(instance);
+                        res.end();
+
+
+                    })
+
+            }
+            else{
+
+                logger.error("DVP-ClusterConfiguration.EditCluster request.body is null");
+
+                var instance = msg.FormatMessage(undefined,"Cluster Update", false,undefined);
+                res.write(instance);
+                res.end();
+
+            }
+
+
+        } catch(exp) {
+
+            logger.error("DVP-ClusterConfiguration.EditCluster stringify json failed", Id, exp);
+            res.end();
+
+        }
+
+
+        //res.end();
+
+    }).catch(function (err){
+
+
+        logger.error("DVP-ClusterConfiguration.EditCluster PGSQL %s failed", Id, err);
+        res.write(msg.FormatMessage(err,"Cluster NotFound", false,undefined));
+
+        res.end();
+
+
+    });
+
+
+
+
+}
+
 function CreateCluster(req, res, next) {
 
 
@@ -1815,3 +1921,4 @@ module.exports.GetCallServers = GetCallServers;
 module.exports.GetProfiles = GetProfiles;
 module.exports.GetNetworkByClusterID =GetNetworkByClusterID;
 module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
+module.exports.EditCluster = EditCluster;

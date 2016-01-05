@@ -85,6 +85,11 @@ server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
     return next();
 } );
 
+server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res, next){
+    restMessageHandler.EditCluster(req.params.id,req,res);
+    return next();
+} );
+
 
 server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, next){
     restMessageHandler.GetClusters(req, res);
@@ -258,8 +263,8 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-var basepath = 'http://'+ host;
-//var basepath = 'http://'+ "localhost"+":"+port;
+//var basepath = 'http://'+ host;
+var basepath = 'http://'+ "localhost"+":"+port;
 
 //var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
 

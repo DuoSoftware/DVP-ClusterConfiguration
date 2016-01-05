@@ -20,7 +20,7 @@ module.exports = {
   {
     "vdomain": "localhost",
     "domain": "localhost",
-    "port": "3434",
+    "port": "3636",
     "version": "1.0"
   },
 
