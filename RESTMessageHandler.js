@@ -242,7 +242,8 @@ function CreateCluster(req, res, next) {
             CloudModel: model,
             Class: cloudData.Class,
             Type: cloudData.Type,
-            Category: cloudData.Category
+            Category: cloudData.Category,
+            Activate: true
 
         })
 
@@ -260,7 +261,7 @@ function CreateCluster(req, res, next) {
                 try {
 
 
-                    var instance = msg.FormatMessage(returnerror,"Cluster creation", status,undefined);
+                    var instance = msg.FormatMessage(returnerror,"Cluster creation", status,inst);
                     res.write(instance);
                     res.end();
 
