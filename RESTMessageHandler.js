@@ -117,17 +117,31 @@ function EditCluster(Id, req, res, next){
 
 
 
-            var model = 0;
+
             var status = false;
             var returnerror= undefined;
 
             if(req.body && cloudInstance){
+                var model = cloudInstance.CloudModel;
 
 
                 var cloudData=req.body;
 
+                if(0<cloudData.CloudModel && cloudData.CloudModel<4) {
+
+                    logger.debug("DVP-ClusterConfiguration.CreateCluster model validated");
+                    model = cloudData.CloudModel;
+
+                }
+                else{
+
+                    logger.debug("DVP-ClusterConfiguration.CreateCluster model validate failed go with private");
+
+                }
+
 
                 cloudInstance.updateAttributes({
+
                         Name: cloudData.Name,
                         CloudModel: model,
                         Class: cloudData.Class,
