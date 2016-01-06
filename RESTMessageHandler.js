@@ -129,8 +129,6 @@ function EditCluster(Id, req, res, next){
 
                 cloudInstance.updateAttributes({
                         Name: cloudData.Name,
-                        CompanyId: cloudData.CompanyId,
-                        TenantId: cloudData.TenantId,
                         CloudModel: model,
                         Class: cloudData.Class,
                         Type: cloudData.Type,
