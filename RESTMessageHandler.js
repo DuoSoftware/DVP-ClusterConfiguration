@@ -28,7 +28,7 @@ function GetClusterByID(res, Id) {
 
                 var instance = msg.FormatMessage(undefined,"Cluster found", true,cloudInstance);
 
-                logger.debug("DVP-ClusterConfiguration.GetClusterByID PGSQL id %s found", Id, cloudInstance);
+                logger.debug("DVP-ClusterConfiguration.GetClusterByID PGSQL id %s found", Id);
 
 
 
@@ -73,7 +73,7 @@ function GetClusters(req, res){
 
                 var instance = msg.FormatMessage(undefined,"Cluster Found", true,cloudInstance);
 
-                logger.debug("DVP-ClusterConfiguration.GetClusters PGSQL  found", cloudInstance);
+                logger.debug("DVP-ClusterConfiguration.GetClusters PGSQL  found");
                 res.write(instance);
             } catch(exp) {
 
@@ -153,7 +153,7 @@ function EditCluster(Id, req, res, next){
 
 
 
-                        logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful', model);
+                        logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful');
                         status = true;
 
                         try {
@@ -267,7 +267,7 @@ function CreateCluster(req, res, next) {
 
 
 
-                logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL Cloud object saved successful', model);
+                logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL Cloud object saved successful');
                 status = true;
 
                 try {
@@ -455,7 +455,7 @@ function AddLoadBalancer(res, req) {
 
         dbmodel.Cloud.find({where: [{ id: loadBalancer.clusterID}, {Activate: true}]}).then(function(cloudObject) {
             if(cloudObject) {
-                logger.debug("DVP-ClusterConfiguration.AddLoadBalancer Cloud Found ",cloudObject);
+                logger.debug("DVP-ClusterConfiguration.AddLoadBalancer Cloud Found ");
 
                 var loadBalancerObject = dbmodel.LoadBalancer.build(
                     {
@@ -470,7 +470,7 @@ function AddLoadBalancer(res, req) {
                     .then(function (instance) {
 
 
-                            logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Saved ",loadBalancerObject);
+                            logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Saved ");
 
                             cloudObject.setLoadBalancer(loadBalancerObject).then(function (cloudInstancex) {
 
@@ -868,7 +868,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
 
                 } else {
 
-                    logger.error("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL Cloud %s NotFound", cloudID, err);
+                    logger.error("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL Cloud %s NotFound", cloudID);
 
                     var instance = msg.FormatMessage(undefined, "AddCallservers to cloud", status, undefined);
                     res.write(instance);
@@ -890,7 +890,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
 
         } else {
 
-            logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL CallServer %s NotFound", Id, err);
+            logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL CallServer %s NotFound", Id);
 
             var instance = msg.FormatMessage(undefined, "AddCallservers to cloud", status, undefined);
             res.write(instance);
@@ -952,7 +952,7 @@ function SetParentCloud(res, chilid, parentid) {
 
                 } else {
 
-                    logger.error("DVP-ClusterConfiguration.SetParentCloud PGSQL ParentCloud %s NotFound", parentid, err);
+                    logger.error("DVP-ClusterConfiguration.SetParentCloud PGSQL ParentCloud %s NotFound", parentid);
 
                     var instance = msg.FormatMessage(err, "Set ParentCloud No Parent", status, undefined);
                     res.write(instance);
@@ -973,7 +973,7 @@ function SetParentCloud(res, chilid, parentid) {
 
         } else {
 
-            logger.error("DVP-ClusterConfiguration.SetParentCloud PGSQL ChildCloud %s NotFound", chilid, err);
+            logger.error("DVP-ClusterConfiguration.SetParentCloud PGSQL ChildCloud %s NotFound", chilid);
 
             var instance = msg.FormatMessage(err, "Set ParentCloud No Cloud", status, undefined);
             res.write(instance);
@@ -1306,7 +1306,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
 
                 } else {
 
-                    logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Cloud %s NotFound ", cloudId, err);
+                    logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Cloud %s NotFound ", cloudId);
                     var instance = msg.FormatMessage(err, "Set Telco Network cloud NotFound", status, undefined);
                     res.write(instance);
                     res.end();
@@ -1324,7 +1324,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
 
         } else {
 
-            logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Network %s NotFound ", networkId, err);
+            logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Network %s NotFound ", networkId);
 
             var instance = msg.FormatMessage(err, "Set Telco Network NotFound", status, undefined);
             res.write(instance);
@@ -1382,7 +1382,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
 
                 } else {
 
-                    logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL CloudEndUser %s NotFound", userID, err);
+                    logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL CloudEndUser %s NotFound", userID);
 
                     var instance = msg.FormatMessage(err, "Set Telco Network To User NotFound", status, undefined);
                     res.write(instance);
@@ -1403,7 +1403,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
 
         } else {
 
-            logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToUSer PGSQL Network %s NotFound", networkId, err);
+            logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToUSer PGSQL Network %s NotFound", networkId);
 
             var instance = msg.FormatMessage(err, "Set Telco Network To Network NotFound", status, undefined);
             res.write(instance);
@@ -1522,7 +1522,7 @@ function CreateEndUser(res,req) {
             }
             else{
 
-                logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID, err);
+                logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID);
                 var instance = msg.FormatMessage(err, "Create EndUser failed", status, undefined);
                 res.write(instance);
                 res.end();
@@ -1560,7 +1560,7 @@ function GetEndUsers(req, res){
     dbmodel.CloudEndUser.findAll().then(function ( enduser) {
 
 
-            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found", enduser);
+            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found");
 
 
             try {
