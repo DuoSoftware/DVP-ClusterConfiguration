@@ -21,7 +21,7 @@ function GetClusterByID(res, Id) {
     logger.debug("DVP-ClusterConfiguration.GetClusterByID HTTP id %s", Id);
 
 
-    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}]}).then(function (cloudInstance) {
+    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbmodel.LoadBalancer, as: "LoadBalancer"}]}).then(function (cloudInstance) {
 
 
             try {
@@ -62,7 +62,7 @@ function GetClusters(req, res){
     logger.debug("DVP-ClusterConfiguration.GetClusters HTTP");
 
 
-    dbmodel.Cloud.findAll({where: [{Activate: true}]}).then(function (cloudInstance) {
+    dbmodel.Cloud.findAll({where: [{Activate: true}],include: [{ model: dbmodel.LoadBalancer, as: "LoadBalancer"}]}).then(function (cloudInstance) {
 
 
 
@@ -593,7 +593,7 @@ function ActivateCloud(res, id, activate){
         }
         else
         {
-            logger.error("DVP-ClusterConfiguration.ActivateCloud Cloud NotFound", err);
+            logger.error("DVP-ClusterConfiguration.ActivateCloud Cloud NotFound");
             var instance = msg.FormatMessage(err, "Activate cloud", status, undefined);
             res.write(instance);
             res.end();
