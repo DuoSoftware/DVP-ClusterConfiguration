@@ -453,7 +453,7 @@ function AddLoadBalancer(res, req) {
     var status = false;
     if(loadBalancer){
 
-        dbmodel.Cloud.find({where: [{ id: loadBalancer.clusterID}, {Activate: true}]}).then(function(cloudObject) {
+        dbmodel.Cloud.find({where: [{ id: loadBalancer.ClusterID}, {Activate: true}]}).then(function(cloudObject) {
             if(cloudObject) {
                 logger.debug("DVP-ClusterConfiguration.AddLoadBalancer Cloud Found ");
 
