@@ -21,7 +21,7 @@ function GetClusterByID(res, Id) {
     logger.debug("DVP-ClusterConfiguration.GetClusterByID HTTP id %s", Id);
 
 
-    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbmodel.LoadBalancer, as: "LoadBalancer"}]}).then(function (cloudInstance) {
+    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbmodel.LoadBalancer, as: "LoadBalancer"},{ model: dbmodel.CallServer, as: "CallServer"}, { model: dbmodel.Network, as: "Network"} ]}).then(function (cloudInstance) {
 
 
             try {
@@ -758,7 +758,7 @@ function EditCallServer(Id, req, res) {
 
 
             }
-            
+
 
         }).catch(function (err){
 
