@@ -685,7 +685,7 @@ function CreateCallServer(req, res, next) {
 
 }
 
-function EditCallServer(Id, req, res, next) {
+function EditCallServer(Id, req, res) {
 
 
 
