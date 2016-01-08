@@ -106,6 +106,12 @@ server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, ne
 server.post('/DVP/API/:version/CloudConfiguration/CallServer', restMessageHandler.CreateCallServer);
 
 
+server.put('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
+    restMessageHandler.EditCallServer(req.params.id,req,res);
+    return next();
+} );
+
+
 server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/Activate/:status', function( req, res, next){
 
     restMessageHandler.ActivateCallServer(res,req.params.id,req.params.status);

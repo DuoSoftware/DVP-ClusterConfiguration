@@ -685,6 +685,110 @@ function CreateCallServer(req, res, next) {
 
 }
 
+function EditCallServer(Id, req, res, next) {
+
+
+
+
+    var status = false;
+    var outerror = undefined;
+
+    logger.debug("DVP-ClusterConfiguration.EditCallServer HTTP id %s ", Id);
+
+    if(req.body){
+
+
+
+        logger.debug("DVP-ClusterConfiguration.EditCallServer Object Validated");
+
+
+        var idx = parseInt(Id);
+        dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).then(function (csInstance) {
+
+
+            try {
+
+                logger.debug("DVP-ClusterConfiguration.EditCallServer id %d Found", Id);
+
+                var csData=req.body;
+
+                csInstance.updateAttributes({
+                    Name: csData.Name,
+                    //ID: DataTypes.INTEGER,
+                    Activate: csData.Activate,
+                    Code: csData.Code,
+                    Class: csData.Class,
+                    Type: csData.Type,
+                    Category: csData.Category,
+                    InternalMainIP: csData.InternalIP
+
+                }).then(function(instance) {
+
+                        logger.debug('DVP-ClusterConfiguration.EditCallServer PGSQL CallServer object updated successful');
+                        status = true;
+
+
+
+                        try {
+
+                            var instance = msg.FormatMessage(outerror, "Updated callserver", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+
+                        }
+                        catch(exp){
+
+                            console.log("There is a error in --> Update Callserver ", exp)
+
+                        }
+                    }).catch(function (err){
+
+                        logger.error("DVP-ClusterConfiguration.EditCallServer PGSQL CallServer Save Failed ", err);
+                        var instance = msg.FormatMessage(err, "Update callserver", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+                    });
+
+
+
+            } catch(exp) {
+
+
+
+            }
+
+            res.end();
+
+        }).catch(function (err){
+
+            logger.error("DVP-ClusterConfiguration.GetCallServerByID id %d Failed", Id, err);
+
+            var instance = msg.FormatMessage(err, "Get callserver by ID", false, undefined);
+            res.write(instance);
+
+            res.end();
+
+        });
+
+
+    }
+    else{
+
+        logger.error("DVP-ClusterConfiguration.CreateCallServer Object Validation Failed");
+        var instance = msg.FormatMessage(undefined, "Create callserver", status, undefined);
+        res.write(instance);
+        res.end();
+
+    }
+
+    return next();
+
+
+}
+
+
 function ActivateCallServer(res, id, activate){
 
 
@@ -1935,3 +2039,4 @@ module.exports.GetProfiles = GetProfiles;
 module.exports.GetNetworkByClusterID =GetNetworkByClusterID;
 module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
 module.exports.EditCluster = EditCluster;
+module.exports.EditCallServer = EditCallServer;
