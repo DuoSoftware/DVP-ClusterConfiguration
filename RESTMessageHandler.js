@@ -758,8 +758,7 @@ function EditCallServer(Id, req, res) {
 
 
             }
-
-            res.end();
+            
 
         }).catch(function (err){
 
