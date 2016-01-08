@@ -636,7 +636,7 @@ function CreateCallServer(req, res, next) {
             Class: csData.Class,
             Type: csData.Type,
             Category: csData.Category,
-            InternalMainIP: csData.InternalIP
+            InternalMainIP: csData.InternalMainIP
         })
 
 
