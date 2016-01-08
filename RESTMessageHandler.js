@@ -755,7 +755,7 @@ function EditCallServer(Id, req, res) {
 
             } catch(exp) {
 
-
+                logger.error("DVP-ClusterConfiguration.EditCallServer PGSQL CallServer Save Failed ", exp);
 
             }
             
@@ -782,7 +782,7 @@ function EditCallServer(Id, req, res) {
 
     }
 
-    return next();
+
 
 
 }
