@@ -932,6 +932,88 @@ function GetCallServers(req, res) {
 
 }
 
+function RemoveCallServerFromCloud(res, Id, cloudID){
+
+
+    logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud id HTTP %s to %s", Id, cloudID);
+    var status = false;
+    dbmodel.CallServer.find({where: [{id: parseInt(Id)}, {Activate: true}]}).then(function (csInstance) {
+
+        if ( csInstance) {
+
+            logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL CallServer %s Found", Id);
+
+
+            dbmodel.Cloud.find({where: [{id: parseInt(cloudID)}, {Activate: true}]}).then(function (cloudInstance) {
+
+                if (cloudInstance) {
+
+                    logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL Cloud %s Found", cloudID);
+
+                    cloudInstance.removeCallServer(csInstance).then(function (cloudInstancex) {
+
+                        logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL");
+
+                        status = true;
+                        var instance = msg.FormatMessage(undefined, "RemoveCallservers to cloud", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+                    }).catch(function(err){
+
+                        status = false;
+                        var instance = msg.FormatMessage(err, "RemoveCallservers to cloud", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+
+                    });
+
+                } else {
+
+                    logger.error("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL Cloud %s NotFound", cloudID);
+
+                    var instance = msg.FormatMessage(undefined, "RemoveCallservers to cloud", status, undefined);
+                    res.write(instance);
+
+                    res.end();
+                }
+
+
+            }).catch(function (err){
+
+                logger.error("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL Cloud %s NotFound", cloudID, err);
+
+                var instance = msg.FormatMessage(undefined, "RemoveCallservers to cloud", status, undefined);
+                res.write(instance);
+
+                res.end();
+
+            });
+
+        } else {
+
+            logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL CallServer %s NotFound", Id);
+
+            var instance = msg.FormatMessage(undefined, "RemoveCallservers to cloud", status, undefined);
+            res.write(instance);
+            res.end();
+        }
+
+    }).catch(function (err){
+
+        logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL CallServer %s NotFound", Id, err);
+
+        var instance = msg.FormatMessage(undefined, "RemoveCallservers to cloud", status, undefined);
+        res.write(instance);
+        res.end();
+    });
+
+
+
+
+}
+
 function AddCallServerToCloud(res, Id, cloudID) {
 
 
@@ -1445,6 +1527,81 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
     });
 }
 
+function RemoveTelcoNetworkFromCloud(res, networkId, cloudId){
+    var status = false;
+
+    logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud HTTP id %s to %s", networkId, cloudId);
+
+    dbmodel.Network.find({where: [{id:  parseInt(networkId)}]}).then(function (networkInstance) {
+
+        if (networkInstance) {
+
+            logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL Network %s Found", networkId);
+
+            dbmodel.Cloud.find({where: [{id: parseInt(cloudId)}, {Activate: true}]}).then(function (cloudInstance) {
+
+                if ( cloudInstance) {
+
+
+                    logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL Cloud %s Found", cloudId);
+
+                    cloudInstance.removeNetwork(networkInstance).then(function (cloudInstancex) {
+
+
+                        logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL");
+
+                        status = true;
+                        var instance = msg.FormatMessage(undefined, "Remove Telco Network cloud", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+                    }).catch (function (err){
+
+                        status = false;
+                        var instance = msg.FormatMessage(err, "Remove Telco Network cloud", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+                    });
+
+                } else {
+
+                    logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL Cloud %s NotFound ", cloudId);
+                    var instance = msg.FormatMessage(err, "Remove Telco Network cloud NotFound", status, undefined);
+                    res.write(instance);
+                    res.end();
+                }
+
+
+            }).catch(function (err){
+
+                logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL Cloud %s NotFound ", cloudId, err);
+                var instance = msg.FormatMessage(err, "Remove Telco Network cloud NotFound", status, undefined);
+                res.write(instance);
+                res.end();
+
+            });
+
+        } else {
+
+            logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL Network %s NotFound ", networkId);
+
+            var instance = msg.FormatMessage(err, "Remove Telco Network NotFound", status, undefined);
+            res.write(instance);
+            res.end();
+        }
+
+    }).catch(function (err){
+
+        logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromCloud PGSQL Network %s NotFound ", networkId, err);
+
+        var instance = msg.FormatMessage(err, "Remove Telco Network NotFound", status, undefined);
+        res.write(instance);
+        res.end();
+
+    });
+}
+
 function SetTelcoNetworkToUSer(res, networkId, userID){
     var status = false;
 
@@ -1518,6 +1675,86 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
         logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToUSer PGSQL Network %s NotFound", networkId, err);
 
         var instance = msg.FormatMessage(err, "Set Telco Network To Network NotFound", status, undefined);
+        res.write(instance);
+        res.end();
+
+
+    });
+}
+
+function RemoveTelcoNetworkFromUser(res, networkId, userID){
+    var status = false;
+
+    logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser HTTP id %s to %s", networkId, userID);
+
+    dbmodel.Network.find({where: [{id: parseInt(networkId)}]}).then(function ( networkInstance) {
+
+        if ( networkInstance) {
+
+            logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL Network %s Found", networkId);
+
+            dbmodel.CloudEndUser.find({where: [{id: parseInt(userID)}]}).then(function ( userInstance) {
+
+                if ( userInstance) {
+
+                    logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL CloudEndUser %s Found", userID);
+
+                    userInstance.removeNetwork(networkInstance).then(function ( cloudInstancex) {
+
+
+                        logger.debug("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL");
+
+                        if(!errx)
+                            status = true;
+                        var instance = msg.FormatMessage(undefined, "Remove Telco Network To User", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+                    }).catch(function (err){
+
+                        status =false;
+                        var instance = msg.FormatMessage(err, "Remove Telco Network To User", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+
+                    });
+
+                } else {
+
+                    logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL CloudEndUser %s NotFound", userID);
+
+                    var instance = msg.FormatMessage(err, "Remove Telco Network To User NotFound", status, undefined);
+                    res.write(instance);
+                    res.end();
+                }
+
+
+            }).catch(function (err){
+
+                logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL CloudEndUser %s NotFound", userID, err);
+
+                var instance = msg.FormatMessage(err, "Remove Telco Network To User NotFound", status, undefined);
+                res.write(instance);
+                res.end();
+
+
+            });
+
+        } else {
+
+            logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL Network %s NotFound", networkId);
+
+            var instance = msg.FormatMessage(err, "Remove Telco Network To Network NotFound", status, undefined);
+            res.write(instance);
+            res.end();
+        }
+
+    }).catch(function (err){
+
+        logger.error("DVP-ClusterConfiguration.RemoveTelcoNetworkFromUser PGSQL Network %s NotFound", networkId, err);
+
+        var instance = msg.FormatMessage(err, "Remove Telco Network To Network NotFound", status, undefined);
         res.write(instance);
         res.end();
 
@@ -2039,3 +2276,6 @@ module.exports.GetNetworkByClusterID =GetNetworkByClusterID;
 module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
 module.exports.EditCluster = EditCluster;
 module.exports.EditCallServer = EditCallServer;
+module.exports.RemoveCallServerFromCloud = RemoveCallServerFromCloud;
+module.exports.RemoveTelcoNetworkFromCloud = RemoveTelcoNetworkFromCloud;
+module.exports.RemoveTelcoNetworkFromUser = RemoveTelcoNetworkFromUser;

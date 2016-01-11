@@ -135,6 +135,12 @@ server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloud
     return next();
 } );
 
+
+server.del('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudid',function( req, res, next){
+    restMessageHandler.RemoveCallServerFromCloud(res, req.params.id,req.params.cloudid);
+    return next();
+} );
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -142,7 +148,7 @@ server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloud
 
 
 server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:parentid',function( req, res, next){
-    restMessageHandler.SetParentCloud(res, req.params.childid,req.params.parentid);
+    restMessageHandler.SetParentCloud(res, req.params.childid, req.params.parentid);
     return next();
 } );
 
@@ -180,11 +186,22 @@ server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNet
 } );
 
 
+server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToCloud/:cloudid',function( req, res, next){
+    restMessageHandler.RemoveTelcoNetworkFromCloud(res,req.params.networkid,req.params.cloudid);
+    return next();
+} );
+
+
 server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',function( req, res, next){
     restMessageHandler.SetTelcoNetworkToUSer(res,req.params.networkid,req.params.userid);
     return next();
 } );
 
+
+server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',function( req, res, next){
+    restMessageHandler.RemoveTelcoNetworkFromUser(res,req.params.networkid,req.params.userid);
+    return next();
+} );
 
 
 server.get('/DVP/API/:version/CloudConfiguration/Networks', function( req, res, next){
