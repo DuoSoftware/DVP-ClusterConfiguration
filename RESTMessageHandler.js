@@ -7,12 +7,12 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 
 
-var redisip =config.Redis.ip;
-var redisport =config.Redis.port ;
+var redisip = config.Redis.ip;
+var redisport = config.Redis.port;
 
-var redisClient = redis.createClient(redisport,redisip);
+var redisClient = redis.createClient(redisport, redisip);
 
-redisClient.on('error',function(err){
+redisClient.on('error', function (err) {
     console.log('Error ' + err);
 });
 
@@ -21,93 +21,97 @@ function GetClusterByID(res, Id) {
     logger.debug("DVP-ClusterConfiguration.GetClusterByID HTTP id %s", Id);
 
 
-    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbmodel.LoadBalancer, as: "LoadBalancer"},{ model: dbmodel.CallServer, as: "CallServer"}, { model: dbmodel.Network, as: "Network"} ]}).then(function (cloudInstance) {
+    dbmodel.Cloud.find({
+        where: [{id: parseInt(Id)}, {Activate: true}],
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {
+            model: dbmodel.CallServer,
+            as: "CallServer"
+        }, {model: dbmodel.Network, as: "Network"}]
+    }).then(function (cloudInstance) {
 
 
-            try {
+        try {
 
-                var instance = msg.FormatMessage(undefined,"Cluster found", true,cloudInstance);
+            var instance = msg.FormatMessage(undefined, "Cluster found", true, cloudInstance);
 
-                logger.debug("DVP-ClusterConfiguration.GetClusterByID PGSQL id %s found", Id);
-
-
-
-                res.write(instance);
-            } catch(exp) {
-
-                logger.error("DVP-ClusterConfiguration.GetClusterByID stringify json failed", Id, exp);
-                //res.write("");
-
-            }
+            logger.debug("DVP-ClusterConfiguration.GetClusterByID PGSQL id %s found", Id);
 
 
-            res.end();
+            res.write(instance);
+        } catch (exp) {
 
-    }).catch(function (err){
+            logger.error("DVP-ClusterConfiguration.GetClusterByID stringify json failed", Id, exp);
+            //res.write("");
+
+        }
 
 
-            logger.error("DVP-ClusterConfiguration.GetClusterByID PGSQL %s failed", Id, err);
-            res.write(msg.FormatMessage(err,"Cluster NotFound", false,undefined));
+        res.end();
 
-            res.end();
+    }).catch(function (err) {
+
+
+        logger.error("DVP-ClusterConfiguration.GetClusterByID PGSQL %s failed", Id, err);
+        res.write(msg.FormatMessage(err, "Cluster NotFound", false, undefined));
+
+        res.end();
 
 
     });
 
 }
 
-function GetClusters(req, res){
+function GetClusters(req, res) {
 
 
     logger.debug("DVP-ClusterConfiguration.GetClusters HTTP");
 
 
-    dbmodel.Cloud.findAll({where: [{Activate: true}],include: [{ model: dbmodel.LoadBalancer, as: "LoadBalancer"}]}).then(function (cloudInstance) {
+    dbmodel.Cloud.findAll({
+        where: [{Activate: true}],
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {
+            model: dbmodel.CallServer,
+            as: "CallServer"
+        }, {model: dbmodel.Network, as: "Network"}]
+    }).then(function (cloudInstance) {
 
 
+        try {
 
 
-            try {
+            var instance = msg.FormatMessage(undefined, "Cluster Found", true, cloudInstance);
+
+            logger.debug("DVP-ClusterConfiguration.GetClusters PGSQL  found");
+            res.write(instance);
+        } catch (exp) {
+
+            logger.error("DVP-ClusterConfiguration.GetClusters stringify json failed", exp);
 
 
+            res.write("");
 
-                var instance = msg.FormatMessage(undefined,"Cluster Found", true,cloudInstance);
-
-                logger.debug("DVP-ClusterConfiguration.GetClusters PGSQL  found");
-                res.write(instance);
-            } catch(exp) {
-
-                logger.error("DVP-ClusterConfiguration.GetClusters stringify json failed",  exp);
-
-
-                res.write("");
-
-            }
-
-
-
+        }
 
 
         res.end();
 
-    }).catch( function(err){
+    }).catch(function (err) {
 
 
-        logger.error("DVP-ClusterConfiguration.GetClusters PGSQL failed",  err);
-        res.write(msg.FormatMessage(err,"Cluster NotFound", false,undefined));
+        logger.error("DVP-ClusterConfiguration.GetClusters PGSQL failed", err);
+        res.write(msg.FormatMessage(err, "Cluster NotFound", false, undefined));
 
     });
 
 
-
 }
 
-function EditCluster(Id, req, res, next){
+function EditCluster(Id, req, res, next) {
 
 
     logger.debug("DVP-ClusterConfiguration.EditCluster HTTP");
 
-    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}]}).then(function (cloudInstance) {
+    dbmodel.Cloud.find({where: [{id: parseInt(Id)}, {Activate: true}]}).then(function (cloudInstance) {
 
 
         try {
@@ -116,24 +120,22 @@ function EditCluster(Id, req, res, next){
             logger.debug("DVP-ClusterConfiguration.EditCluster PGSQL id %s found", Id);
 
 
-
-
             var status = false;
-            var returnerror= undefined;
+            var returnerror = undefined;
 
-            if(req.body && cloudInstance){
+            if (req.body && cloudInstance) {
                 var model = cloudInstance.CloudModel;
 
 
-                var cloudData=req.body;
+                var cloudData = req.body;
 
-                if(0<cloudData.CloudModel && cloudData.CloudModel<4) {
+                if (0 < cloudData.CloudModel && cloudData.CloudModel < 4) {
 
                     logger.debug("DVP-ClusterConfiguration.CreateCluster model validated");
                     model = cloudData.CloudModel;
 
                 }
-                else{
+                else {
 
                     logger.debug("DVP-ClusterConfiguration.CreateCluster model validate failed go with private");
 
@@ -142,59 +144,57 @@ function EditCluster(Id, req, res, next){
 
                 cloudInstance.updateAttributes({
 
-                        Name: cloudData.Name,
-                        CloudModel: model,
-                        Class: cloudData.Class,
-                        Type: cloudData.Type,
-                        Category: cloudData.Category
+                    Name: cloudData.Name,
+                    CloudModel: model,
+                    Class: cloudData.Class,
+                    Type: cloudData.Type,
+                    Category: cloudData.Category
 
-                    }).then(function(inst) {
-
-
+                }).then(function (inst) {
 
 
-                        logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful');
-                        status = true;
+                    logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful');
+                    status = true;
 
-                        try {
-
-
-                            var instance = msg.FormatMessage(returnerror,"Cluster updating", status,undefined);
-                            res.write(instance);
-                            res.end();
+                    try {
 
 
-                        }
-                        catch(exp){
-
-                            logger.error('DVP-ClusterConfiguration.EditCluster Update failed ', exp);
-
-                        }
-                    }).catch(function (err){
-
-
-                        logger.error("DVP-ClusterConfiguration.EditCluster PGSQL Update failed ",err);
-                        returnerror = err;
-                        var instance = msg.FormatMessage(returnerror,"Cluster Update", status,undefined);
+                        var instance = msg.FormatMessage(returnerror, "Cluster updating", status, undefined);
                         res.write(instance);
                         res.end();
 
 
-                    })
+                    }
+                    catch (exp) {
+
+                        logger.error('DVP-ClusterConfiguration.EditCluster Update failed ', exp);
+
+                    }
+                }).catch(function (err) {
+
+
+                    logger.error("DVP-ClusterConfiguration.EditCluster PGSQL Update failed ", err);
+                    returnerror = err;
+                    var instance = msg.FormatMessage(returnerror, "Cluster Update", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+
+                })
 
             }
-            else{
+            else {
 
                 logger.error("DVP-ClusterConfiguration.EditCluster request.body is null");
 
-                var instance = msg.FormatMessage(undefined,"Cluster Update", false,undefined);
+                var instance = msg.FormatMessage(undefined, "Cluster Update", false, undefined);
                 res.write(instance);
                 res.end();
 
             }
 
 
-        } catch(exp) {
+        } catch (exp) {
 
             logger.error("DVP-ClusterConfiguration.EditCluster stringify json failed", Id, exp);
             res.end();
@@ -204,11 +204,11 @@ function EditCluster(Id, req, res, next){
 
         //res.end();
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
 
         logger.error("DVP-ClusterConfiguration.EditCluster PGSQL %s failed", Id, err);
-        res.write(msg.FormatMessage(err,"Cluster NotFound", false,undefined));
+        res.write(msg.FormatMessage(err, "Cluster NotFound", false, undefined));
 
         res.end();
 
@@ -216,32 +216,29 @@ function EditCluster(Id, req, res, next){
     });
 
 
-
-
 }
 
 function CreateCluster(req, res, next) {
-
 
 
     logger.debug("DVP-ClusterConfiguration.CreateCluster HTTP");
 
     var model = 0;
     var status = false;
-    var returnerror= undefined;
+    var returnerror = undefined;
 
-    if(req.body){
+    if (req.body) {
 
 
-        var cloudData=req.body;
+        var cloudData = req.body;
 
-        if(0<cloudData.CloudModel && cloudData.CloudModel<4) {
+        if (0 < cloudData.CloudModel && cloudData.CloudModel < 4) {
 
             logger.debug("DVP-ClusterConfiguration.CreateCluster model validated");
             model = cloudData.CloudModel;
 
         }
-        else{
+        else {
 
             logger.debug("DVP-ClusterConfiguration.CreateCluster model validate failed go with private");
 
@@ -262,9 +259,7 @@ function CreateCluster(req, res, next) {
 
         cloud
             .save()
-            .then(function(inst) {
-
-
+            .then(function (inst) {
 
 
                 logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL Cloud object saved successful');
@@ -273,23 +268,23 @@ function CreateCluster(req, res, next) {
                 try {
 
 
-                    var instance = msg.FormatMessage(returnerror,"Cluster creation", status,inst);
+                    var instance = msg.FormatMessage(returnerror, "Cluster creation", status, inst);
                     res.write(instance);
                     res.end();
 
 
                 }
-                catch(exp){
+                catch (exp) {
 
                     logger.error('DVP-ClusterConfiguration.CreateCluster Service failed ', exp);
 
                 }
-            }).catch(function (err){
+            }).catch(function (err) {
 
 
-                logger.error("DVP-ClusterConfiguration.CreateCluster PGSQL save failed ",err);
+                logger.error("DVP-ClusterConfiguration.CreateCluster PGSQL save failed ", err);
                 returnerror = err;
-                var instance = msg.FormatMessage(returnerror,"Cluster creation", status,undefined);
+                var instance = msg.FormatMessage(returnerror, "Cluster creation", status, undefined);
                 res.write(instance);
                 res.end();
 
@@ -297,13 +292,12 @@ function CreateCluster(req, res, next) {
             })
 
 
-
     }
-    else{
+    else {
 
         logger.error("DVP-ClusterConfiguration.CreateCluster request.body is null");
 
-        var instance = msg.FormatMessage(undefined,"Cluster creation", false,undefined);
+        var instance = msg.FormatMessage(undefined, "Cluster creation", false, undefined);
         res.write(instance);
         res.end();
 
@@ -329,7 +323,7 @@ function StoreIPAddressDetails(res, req) {
         dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).then(function (csInstance) {
             try {
 
-                if ( csInstance) {
+                if (csInstance) {
 
                     var IP = dbmodel.IPAddress.build(
                         {
@@ -342,61 +336,59 @@ function StoreIPAddressDetails(res, req) {
                     logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer Found");
 
 
-
                     IP.save()
                         .then(function (inst) {
 
-                                logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved");
+                            logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved");
 
-                                try {
-                                    IP.setCallServer(csInstance).then(function (inst) {
-
-
-                                        try {
+                            try {
+                                IP.setCallServer(csInstance).then(function (inst) {
 
 
-                                                logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Successful");
-                                                status = true;
-                                                var instance = msg.FormatMessage(undefined,"Store IPAddress", status,undefined);
-                                                res.write(instance);
-                                                res.end();
+                                    try {
 
 
-
-                                        }
-                                        catch(exxy) {
-
-                                            logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Failed",exxy);
-
-                                        }
-
-                                    }).catch(function (err){
-
-
-                                        logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Failed",err);
-
-                                        var instance = msg.FormatMessage(err,"Store IPAddress", status,undefined);
+                                        logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Successful");
+                                        status = true;
+                                        var instance = msg.FormatMessage(undefined, "Store IPAddress", status, undefined);
                                         res.write(instance);
                                         res.end();
 
 
-                                    });
-                                } catch (exxxx) {
+                                    }
+                                    catch (exxy) {
 
-                                    logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Failed",exxxx);
-                                    var instance = msg.FormatMessage(exxxx,"Store IPAddress", status,undefined);
+                                        logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Failed", exxy);
+
+                                    }
+
+                                }).catch(function (err) {
+
+
+                                    logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Failed", err);
+
+                                    var instance = msg.FormatMessage(err, "Store IPAddress", status, undefined);
                                     res.write(instance);
                                     res.end();
 
 
-                                }
+                                });
+                            } catch (exxxx) {
+
+                                logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Set to Callserver Failed", exxxx);
+                                var instance = msg.FormatMessage(exxxx, "Store IPAddress", status, undefined);
+                                res.write(instance);
+                                res.end();
 
 
-                        }).catch(function (err){
+                            }
 
 
-                            logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved Failed",err);
-                            var instance = msg.FormatMessage(err,"Store IPAddress", status,undefined);
+                        }).catch(function (err) {
+
+
+                            logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL IPAddresed Saved Failed", err);
+                            var instance = msg.FormatMessage(err, "Store IPAddress", status, undefined);
                             res.write(instance);
                             res.end();
 
@@ -406,7 +398,7 @@ function StoreIPAddressDetails(res, req) {
                 } else {
 
                     logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer NotFound");
-                    var instance = msg.FormatMessage(undefined,"Store IPAddress", status,undefined);
+                    var instance = msg.FormatMessage(undefined, "Store IPAddress", status, undefined);
                     res.write(instance);
                     res.end();
                 }
@@ -414,7 +406,7 @@ function StoreIPAddressDetails(res, req) {
             } catch (ex) {
 
                 logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer NotFound", ex);
-                var instance = msg.FormatMessage(undefined,"Store IPAddress", status,undefined);
+                var instance = msg.FormatMessage(undefined, "Store IPAddress", status, undefined);
                 res.write(instance);
                 res.end();
 
@@ -422,10 +414,10 @@ function StoreIPAddressDetails(res, req) {
             }
 
 
-        }).then(function (err){
+        }).then(function (err) {
 
             logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer NotFound", err);
-            var instance = msg.FormatMessage(undefined,"Store IPAddress", status,undefined);
+            var instance = msg.FormatMessage(undefined, "Store IPAddress", status, undefined);
             res.write(instance);
             res.end();
 
@@ -436,7 +428,7 @@ function StoreIPAddressDetails(res, req) {
     } else {
 
         logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails Object Validation Failed");
-        var instance = msg.FormatMessage(undefined,"Store IPAddress", status,undefined);
+        var instance = msg.FormatMessage(undefined, "Store IPAddress", status, undefined);
         res.write(instance);
         res.end();
 
@@ -449,12 +441,12 @@ function AddLoadBalancer(res, req) {
 
     logger.debug("DVP-ClusterConfiguration.AddLoadBalancer HTTP");
 
-    var loadBalancer=req.body;
+    var loadBalancer = req.body;
     var status = false;
-    if(loadBalancer){
+    if (loadBalancer) {
 
-        dbmodel.Cloud.find({where: [{ id: loadBalancer.ClusterID}, {Activate: true}]}).then(function(cloudObject) {
-            if(cloudObject) {
+        dbmodel.Cloud.find({where: [{id: loadBalancer.ClusterID}, {Activate: true}]}).then(function (cloudObject) {
+            if (cloudObject) {
                 logger.debug("DVP-ClusterConfiguration.AddLoadBalancer Cloud Found ");
 
                 var loadBalancerObject = dbmodel.LoadBalancer.build(
@@ -470,42 +462,41 @@ function AddLoadBalancer(res, req) {
                     .then(function (instance) {
 
 
-                            logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Saved ");
+                        logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Saved ");
 
-                            cloudObject.setLoadBalancer(loadBalancerObject).then(function (cloudInstancex) {
+                        cloudObject.setLoadBalancer(loadBalancerObject).then(function (cloudInstancex) {
 
-                                logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud");
+                            logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud");
 
-                                status = true;
+                            status = true;
 
-                                var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
-                                res.write(instance);
-                                res.end();
+                            var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
+                            res.write(instance);
+                            res.end();
 
 
-                            }).catch(function (err){
+                        }).catch(function (err) {
 
-                                logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud failed");
+                            logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud failed");
 
-                                status = false;
+                            status = false;
 
-                                var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
-                                res.write(instance);
-                                res.end();
+                            var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
+                            res.write(instance);
+                            res.end();
 
-                            });
+                        });
 
-                    }).catch(function (err){
+                    }).catch(function (err) {
 
                         var instance = msg.FormatMessage(err, "Add LoadBalancer", status, undefined);
                         res.write(instance);
 
-                        logger.error("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Save Failed ",err);
+                        logger.error("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Save Failed ", err);
 
                     });
             }
-            else
-            {
+            else {
                 logger.error("DVP-ClusterConfiguration.AddLoadBalancer Cloud NotFound ");
                 var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
                 res.write(instance);
@@ -513,7 +504,7 @@ function AddLoadBalancer(res, req) {
 
             }
 
-        }).catch(function (err){
+        }).catch(function (err) {
 
             logger.error("DVP-ClusterConfiguration.AddLoadBalancer Cloud NotFound ");
             var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
@@ -524,7 +515,7 @@ function AddLoadBalancer(res, req) {
 
 
     }
-    else{
+    else {
 
         var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
         res.write(instance);
@@ -536,7 +527,7 @@ function AddLoadBalancer(res, req) {
 
 }
 
-function ActivateCloud(res, id, activate){
+function ActivateCloud(res, id, activate) {
 
 
     logger.debug("DVP-ClusterConfiguration.ActivateCloud HTTP %s", id);
@@ -546,39 +537,39 @@ function ActivateCloud(res, id, activate){
     var status = false;
     var idx = parseInt(id);
     var outerror = undefined;
-    dbmodel.Cloud.find({where:{ id: idx }}).then(function(cloudObject) {
-        if(cloudObject) {
+    dbmodel.Cloud.find({where: {id: idx}}).then(function (cloudObject) {
+        if (cloudObject) {
 
             logger.debug("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Found");
 
 
             cloudObject.updateAttributes({
 
-                    Activate: activeStatus
+                Activate: activeStatus
 
-                }).then(function (instance) {
+            }).then(function (instance) {
 
 
                 status = true;
                 logger.error("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Activate Successful");
 
 
-                    try {
+                try {
 
-                        var instance = msg.FormatMessage(outerror, "Activate cloud", status, undefined);
-                        res.write(instance);
-                        res.end();
+                    var instance = msg.FormatMessage(outerror, "Activate cloud", status, undefined);
+                    res.write(instance);
+                    res.end();
 
-                    }
-                    catch (exp) {
+                }
+                catch (exp) {
 
-                        logger.error("DVP-ClusterConfiguration.ActivateCloud Cloud Activate Failed", exp);
+                    logger.error("DVP-ClusterConfiguration.ActivateCloud Cloud Activate Failed", exp);
 
-                    }
+                }
 
-                }).catch(function (err){
+            }).catch(function (err) {
 
-                if(err){
+                if (err) {
 
                     logger.error("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Activation Failed", err);
                     outerror = err;
@@ -591,15 +582,14 @@ function ActivateCloud(res, id, activate){
                 }
             })
         }
-        else
-        {
+        else {
             logger.error("DVP-ClusterConfiguration.ActivateCloud Cloud NotFound");
             var instance = msg.FormatMessage(err, "Activate cloud", status, undefined);
             res.write(instance);
             res.end();
 
         }
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.error("DVP-ClusterConfiguration.ActivateCloud Cloud NotFound", err);
         var instance = msg.FormatMessage(err, "Activate cloud", status, undefined);
@@ -613,18 +603,17 @@ function ActivateCloud(res, id, activate){
 function CreateCallServer(req, res, next) {
 
 
-
     logger.debug("DVP-ClusterConfiguration.CreateCallServer HTTP");
 
     var model = 0;
     var status = false;
     var outerror = undefined;
 
-    if(req.body){
+    if (req.body) {
 
         logger.debug("DVP-ClusterConfiguration.CreateCallServer Object Validated");
 
-        var csData=req.body;
+        var csData = req.body;
 
         var callserver = dbmodel.CallServer.build({
             Name: csData.Name,
@@ -642,11 +631,10 @@ function CreateCallServer(req, res, next) {
 
         callserver
             .save()
-            .then(function(instance) {
+            .then(function (instance) {
 
-                    logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful');
-                    status = true;
-
+                logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful');
+                status = true;
 
 
                 try {
@@ -657,12 +645,12 @@ function CreateCallServer(req, res, next) {
 
 
                 }
-                catch(exp){
+                catch (exp) {
 
                     console.log("There is a error in --> CreateCluster ", exp)
 
                 }
-            }).catch(function (err){
+            }).catch(function (err) {
 
                 logger.error("DVP-ClusterConfiguration.CreateCallServer PGSQL CallServer Save Failed ", err);
                 var instance = msg.FormatMessage(err, "Create callserver", status, undefined);
@@ -671,7 +659,7 @@ function CreateCallServer(req, res, next) {
 
             });
     }
-    else{
+    else {
 
         logger.error("DVP-ClusterConfiguration.CreateCallServer Object Validation Failed");
         var instance = msg.FormatMessage(undefined, "Create callserver", status, undefined);
@@ -688,15 +676,12 @@ function CreateCallServer(req, res, next) {
 function EditCallServer(Id, req, res) {
 
 
-
-
     var status = false;
     var outerror = undefined;
 
     logger.debug("DVP-ClusterConfiguration.EditCallServer HTTP id %s ", Id);
 
-    if(req.body){
-
+    if (req.body) {
 
 
         logger.debug("DVP-ClusterConfiguration.EditCallServer Object Validated");
@@ -710,7 +695,7 @@ function EditCallServer(Id, req, res) {
 
                 logger.debug("DVP-ClusterConfiguration.EditCallServer id %d Found", Id);
 
-                var csData=req.body;
+                var csData = req.body;
 
                 csInstance.updateAttributes({
                     Name: csData.Name,
@@ -722,45 +707,43 @@ function EditCallServer(Id, req, res) {
                     Category: csData.Category,
                     InternalMainIP: csData.InternalIP
 
-                }).then(function(instance) {
+                }).then(function (instance) {
 
-                        logger.debug('DVP-ClusterConfiguration.EditCallServer PGSQL CallServer object updated successful');
-                        status = true;
-
-
-
-                        try {
-
-                            var instance = msg.FormatMessage(outerror, "Updated callserver", status, undefined);
-                            res.write(instance);
-                            res.end();
+                    logger.debug('DVP-ClusterConfiguration.EditCallServer PGSQL CallServer object updated successful');
+                    status = true;
 
 
-                        }
-                        catch(exp){
+                    try {
 
-                            console.log("There is a error in --> Update Callserver ", exp)
-
-                        }
-                    }).catch(function (err){
-
-                        logger.error("DVP-ClusterConfiguration.EditCallServer PGSQL CallServer Save Failed ", err);
-                        var instance = msg.FormatMessage(err, "Update callserver", status, undefined);
+                        var instance = msg.FormatMessage(outerror, "Updated callserver", status, undefined);
                         res.write(instance);
                         res.end();
 
-                    });
+
+                    }
+                    catch (exp) {
+
+                        console.log("There is a error in --> Update Callserver ", exp)
+
+                    }
+                }).catch(function (err) {
+
+                    logger.error("DVP-ClusterConfiguration.EditCallServer PGSQL CallServer Save Failed ", err);
+                    var instance = msg.FormatMessage(err, "Update callserver", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+                });
 
 
-
-            } catch(exp) {
+            } catch (exp) {
 
                 logger.error("DVP-ClusterConfiguration.EditCallServer PGSQL CallServer Save Failed ", exp);
 
             }
 
 
-        }).catch(function (err){
+        }).catch(function (err) {
 
             logger.error("DVP-ClusterConfiguration.GetCallServerByID id %d Failed", Id, err);
 
@@ -773,7 +756,7 @@ function EditCallServer(Id, req, res) {
 
 
     }
-    else{
+    else {
 
         logger.error("DVP-ClusterConfiguration.CreateCallServer Object Validation Failed");
         var instance = msg.FormatMessage(undefined, "Create callserver", status, undefined);
@@ -783,12 +766,10 @@ function EditCallServer(Id, req, res) {
     }
 
 
-
-
 }
 
 
-function ActivateCallServer(res, id, activate){
+function ActivateCallServer(res, id, activate) {
 
 
     var activeStatus = (activate === 'true');
@@ -799,8 +780,8 @@ function ActivateCallServer(res, id, activate){
     logger.debug("DVP-ClusterConfiguration.ActivateCallServer HTTP %s ", id);
 
     var status = false;
-    dbmodel.CallServer.find({where: [{ id: idx }]}).then(function( csObject) {
-        if(csObject) {
+    dbmodel.CallServer.find({where: [{id: idx}]}).then(function (csObject) {
+        if (csObject) {
 
             logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer Found");
 
@@ -838,15 +819,14 @@ function ActivateCallServer(res, id, activate){
         }
 
 
-        else
-        {
+        else {
             logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer NotFound ", err);
             var instance = msg.FormatMessage(undefined, "Activate callserver", status, undefined);
             res.write(instance);
             res.end();
 
         }
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer NotFound ", err);
         var instance = msg.FormatMessage(undefined, "Activate callserver", status, undefined);
@@ -866,22 +846,21 @@ function GetCallServerByID(res, Id) {
     dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).then(function (csInstance) {
 
 
-            try {
-                var instance = msg.FormatMessage(undefined, "Get callserver by ID", true, csInstance);
-                res.write(instance);
+        try {
+            var instance = msg.FormatMessage(undefined, "Get callserver by ID", true, csInstance);
+            res.write(instance);
 
-                logger.debug("DVP-ClusterConfiguration.GetCallServerByID id %d Found", Id);
-
-
-            } catch(exp) {
+            logger.debug("DVP-ClusterConfiguration.GetCallServerByID id %d Found", Id);
 
 
+        } catch (exp) {
 
-            }
+
+        }
 
         res.end();
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.error("DVP-ClusterConfiguration.GetCallServerByID id %d Failed", Id, err);
 
@@ -903,23 +882,22 @@ function GetCallServers(req, res) {
     dbmodel.CallServer.findAll({where: [{Activate: true}]}).then(function (csInstance) {
 
 
-            try {
+        try {
 
 
-                logger.debug("DVP-ClusterConfiguration.GetCallServers Found");
+            logger.debug("DVP-ClusterConfiguration.GetCallServers Found");
 
-                var instance = msg.FormatMessage(undefined, "Get callservers", true, csInstance);
-                res.write(instance);
+            var instance = msg.FormatMessage(undefined, "Get callservers", true, csInstance);
+            res.write(instance);
 
-            } catch(exp) {
+        } catch (exp) {
 
 
-
-            }
+        }
 
         res.end();
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
 
         logger.error("DVP-ClusterConfiguration.GetCallServers Failed", err);
@@ -1021,7 +999,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
     var status = false;
     dbmodel.CallServer.find({where: [{id: parseInt(Id)}, {Activate: true}]}).then(function (csInstance) {
 
-        if ( csInstance) {
+        if (csInstance) {
 
             logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL CallServer %s Found", Id);
 
@@ -1041,7 +1019,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
                         res.write(instance);
                         res.end();
 
-                    }).catch(function(err){
+                    }).catch(function (err) {
 
                         status = false;
                         var instance = msg.FormatMessage(err, "AddCallservers to cloud", status, undefined);
@@ -1062,7 +1040,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
                 }
 
 
-            }).catch(function (err){
+            }).catch(function (err) {
 
                 logger.error("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL Cloud %s NotFound", cloudID, err);
 
@@ -1082,7 +1060,7 @@ function AddCallServerToCloud(res, Id, cloudID) {
             res.end();
         }
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL CallServer %s NotFound", Id, err);
 
@@ -1096,25 +1074,24 @@ function AddCallServerToCloud(res, Id, cloudID) {
 function SetParentCloud(res, chilid, parentid) {
 
 
-
     logger.debug("DVP-ClusterConfiguration.SetParentCloud HTTP id %s to %s", chilid, parentid);
 
     var status = false;
-    dbmodel.Cloud.find({where: [{id: parseInt(chilid)}, {Activate: true}]}).then(function ( childInstance) {
+    dbmodel.Cloud.find({where: [{id: parseInt(chilid)}, {Activate: true}]}).then(function (childInstance) {
 
-        if ( childInstance && childInstance.CloudModel > 1) {
+        if (childInstance && childInstance.CloudModel > 1) {
 
 
             logger.debug("DVP-ClusterConfiguration.SetParentCloud PGSQL ChildCloud %s Found", chilid);
 
-            dbmodel.Cloud.find({where: [{id: parseInt(parentid)}, {Activate: true}]}).then(function ( parentInstance) {
+            dbmodel.Cloud.find({where: [{id: parseInt(parentid)}, {Activate: true}]}).then(function (parentInstance) {
 
-                if ( parentInstance && (childInstance.id != parentInstance.id) && childInstance.CloudModel == 1) {
+                if (parentInstance && (childInstance.id != parentInstance.id) && childInstance.CloudModel == 1) {
 
                     logger.debug("DVP-ClusterConfiguration.SetParentCloud PGSQL ParentCloud %s Found", parentid);
 
 
-                    childInstance.setParentCloud(parentInstance).then(function ( cloudInstancex) {
+                    childInstance.setParentCloud(parentInstance).then(function (cloudInstancex) {
 
                         logger.debug("DVP-ClusterConfiguration.SetParentCloud PGSQL");
 
@@ -1124,13 +1101,12 @@ function SetParentCloud(res, chilid, parentid) {
                         res.write(instance);
                         res.end();
 
-                    }).catch(function (err){
+                    }).catch(function (err) {
 
                         status = false;
                         var instance = msg.FormatMessage(err, "Set ParentCloud", status, undefined);
                         res.write(instance);
                         res.end();
-
 
 
                     });
@@ -1145,7 +1121,7 @@ function SetParentCloud(res, chilid, parentid) {
                 }
 
 
-            }).catch(function (err){
+            }).catch(function (err) {
 
 
                 logger.error("DVP-ClusterConfiguration.SetParentCloud PGSQL ParentCloud %s NotFound", parentid, err);
@@ -1166,7 +1142,7 @@ function SetParentCloud(res, chilid, parentid) {
             res.end();
         }
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.error("DVP-ClusterConfiguration.SetParentCloud PGSQL ChildCloud %s NotFound", chilid, err);
 
@@ -1176,38 +1152,35 @@ function SetParentCloud(res, chilid, parentid) {
         res.end();
 
 
-
     });
 
 }
 
-function GetNetworks(req, res){
+function GetNetworks(req, res) {
 
     logger.debug("DVP-ClusterConfiguration.GetNetworks HTTP");
 
     dbmodel.Network.findAll().then(function (network) {
 
 
-
-            logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network Found");
-
-
-            try {
-                var instance = msg.FormatMessage(undefined, "Get Networks", true, network);
-                res.write(instance);
+        logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network Found");
 
 
-            } catch(exp) {
+        try {
+            var instance = msg.FormatMessage(undefined, "Get Networks", true, network);
+            res.write(instance);
 
 
+        } catch (exp) {
 
-            }
+
+        }
 
 
         res.end();
-    }).catch(function (err){
+    }).catch(function (err) {
 
-        logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network NotFound",  err);
+        logger.debug("DVP-ClusterConfiguration.GetNetworks PGSQL Network NotFound", err);
 
 
         var instance = msg.FormatMessage(err, "Get Networks", false, undefined);
@@ -1224,30 +1197,31 @@ function GetNetworkByClusterID(req, res, Id) {
     logger.debug("DVP-ClusterConfiguration.GetNetworkByClusterID HTTP id %d", Id);
 
 
-    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbmodel.Network, as: "Network"}]}).then(function (cloudInstance) {
+    dbmodel.Cloud.find({
+        where: [{id: parseInt(Id)}, {Activate: true}],
+        include: [{model: dbmodel.Network, as: "Network"}]
+    }).then(function (cloudInstance) {
 
 
+        try {
 
 
-            try {
+            logger.debug("DVP-ClusterConfiguration.GetNetworkByClusterID PGSQL id %s found", Id);
 
+            var instance = msg.FormatMessage(undefined, "Get Network by ClusterID", true, cloudInstance.Network);
+            res.write(instance);
 
-                logger.debug("DVP-ClusterConfiguration.GetNetworkByClusterID PGSQL id %s found", Id);
+        } catch (exp) {
 
-                var instance = msg.FormatMessage(undefined, "Get Network by ClusterID", true, cloudInstance.Network);
-                res.write(instance);
+            logger.error("DVP-ClusterConfiguration.GetNetworkByClusterID stringify json id %s failed", Id, exp);
+            //res.write("");
 
-            } catch(exp) {
-
-                logger.error("DVP-ClusterConfiguration.GetNetworkByClusterID stringify json id %s failed", Id, exp);
-                //res.write("");
-
-            }
+        }
 
 
         res.end();
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
         var instance = msg.FormatMessage(err, "Get Network by ClusterID", false, undefined);
         res.write(instance);
@@ -1259,12 +1233,12 @@ function GetNetworkByClusterID(req, res, Id) {
 
 }
 
-function CreateTelcoNetwork(res, req){
+function CreateTelcoNetwork(res, req) {
 
 
     /*
 
-    *  id serial NOT NULL,
+     *  id serial NOT NULL,
      "Type" character varying(255),
      "Owner" integer,
      "Network" character varying(255),
@@ -1284,14 +1258,12 @@ function CreateTelcoNetwork(res, req){
     var model = 0;
     var status = false;
     var outerror = undefined;
-    if(req.body){
+    if (req.body) {
 
         logger.debug("DVP-ClusterConfiguration.CreateTelcoNetwork Object Validated", req.body);
 
 
-
-        var networkData=req.body;
-
+        var networkData = req.body;
 
 
         var network = dbmodel.Network.build({
@@ -1309,13 +1281,11 @@ function CreateTelcoNetwork(res, req){
 
         network
             .save()
-            .then(function(instance) {
+            .then(function (instance) {
 
 
-
-                    logger.debug('DVP-ClusterConfiguration.CreateTelcoNetwork PGSQL TelcoNetwork object saved successful');
-                    status = true;
-
+                logger.debug('DVP-ClusterConfiguration.CreateTelcoNetwork PGSQL TelcoNetwork object saved successful');
+                status = true;
 
 
                 try {
@@ -1326,12 +1296,12 @@ function CreateTelcoNetwork(res, req){
 
 
                 }
-                catch(exp){
+                catch (exp) {
 
                     console.log("There is a error in --> CreateCluster ", exp)
 
                 }
-            }).catch(function (err){
+            }).catch(function (err) {
 
 
                 logger.error("DVP-ClusterConfiguration.CreateTelcoNetwork PGSQL TelcoNetwork Save Failed ", err);
@@ -1344,9 +1314,8 @@ function CreateTelcoNetwork(res, req){
             });
 
 
-
     }
-    else{
+    else {
 
         logger.error("DVP-ClusterConfiguration.CreateTelcoNetwork Object Validation Failed");
         var instance = msg.FormatMessage(undefined, "Create Telco Network", status, undefined);
@@ -1358,7 +1327,7 @@ function CreateTelcoNetwork(res, req){
 
 }
 
-function CreateEndUserNetwork(res, req){
+function CreateEndUserNetwork(res, req) {
 
 
     /*
@@ -1382,14 +1351,12 @@ function CreateEndUserNetwork(res, req){
 
     var model = 0;
     var status = false;
-    if(req.body){
+    if (req.body) {
 
         logger.debug("DVP-ClusterConfiguration.CreateEndUserNetwork Object Validated", req.body);
 
 
-
-        var networkData=req.body;
-
+        var networkData = req.body;
 
 
         var network = dbmodel.Network.build({
@@ -1407,11 +1374,11 @@ function CreateEndUserNetwork(res, req){
 
         network
             .save()
-            .then(function(instance) {
+            .then(function (instance) {
 
 
-                    logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL UserNetwork object saved successful');
-                    status = true;
+                logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL UserNetwork object saved successful');
+                status = true;
 
 
                 try {
@@ -1422,12 +1389,12 @@ function CreateEndUserNetwork(res, req){
 
 
                 }
-                catch(exp){
+                catch (exp) {
 
                     console.log("There is a error in --> CreateCluster ", exp)
 
                 }
-            }).catch(function (err){
+            }).catch(function (err) {
 
                 logger.error("DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL UserNetwork Save Failed ", err);
                 var instance = msg.FormatMessage(err, "Create User Network", status, undefined);
@@ -1438,9 +1405,8 @@ function CreateEndUserNetwork(res, req){
             });
 
 
-
     }
-    else{
+    else {
 
         logger.error("DVP-ClusterConfiguration.CreateEndUserNetwork Object Validation Failed");
         var instance = msg.FormatMessage(undefined, "Create User Network", status, undefined);
@@ -1452,12 +1418,12 @@ function CreateEndUserNetwork(res, req){
 
 }
 
-function SetTelcoNetworkToCloud(res, networkId, cloudId){
+function SetTelcoNetworkToCloud(res, networkId, cloudId) {
     var status = false;
 
     logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToCloud HTTP id %s to %s", networkId, cloudId);
 
-    dbmodel.Network.find({where: [{id:  parseInt(networkId)}]}).then(function (networkInstance) {
+    dbmodel.Network.find({where: [{id: parseInt(networkId)}]}).then(function (networkInstance) {
 
         if (networkInstance) {
 
@@ -1465,7 +1431,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
 
             dbmodel.Cloud.find({where: [{id: parseInt(cloudId)}, {Activate: true}]}).then(function (cloudInstance) {
 
-                if ( cloudInstance) {
+                if (cloudInstance) {
 
 
                     logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Cloud %s Found", cloudId);
@@ -1480,7 +1446,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
                         res.write(instance);
                         res.end();
 
-                    }).catch (function (err){
+                    }).catch(function (err) {
 
                         status = false;
                         var instance = msg.FormatMessage(err, "Set Telco Network cloud", status, undefined);
@@ -1498,7 +1464,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
                 }
 
 
-            }).catch(function (err){
+            }).catch(function (err) {
 
                 logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Cloud %s NotFound ", cloudId, err);
                 var instance = msg.FormatMessage(err, "Set Telco Network cloud NotFound", status, undefined);
@@ -1516,7 +1482,7 @@ function SetTelcoNetworkToCloud(res, networkId, cloudId){
             res.end();
         }
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL Network %s NotFound ", networkId, err);
 
@@ -1607,32 +1573,32 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
 
     logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToUSer HTTP id %s to %s", networkId, userID);
 
-    dbmodel.Network.find({where: [{id: parseInt(networkId)}]}).then(function ( networkInstance) {
+    dbmodel.Network.find({where: [{id: parseInt(networkId)}]}).then(function (networkInstance) {
 
-        if ( networkInstance) {
+        if (networkInstance) {
 
             logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToUSer PGSQL Network %s Found", networkId);
 
-            dbmodel.CloudEndUser.find({where: [{id: parseInt(userID)}]}).then(function ( userInstance) {
+            dbmodel.CloudEndUser.find({where: [{id: parseInt(userID)}]}).then(function (userInstance) {
 
-                if ( userInstance) {
+                if (userInstance) {
 
                     logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL CloudEndUser %s Found", userID);
 
-                    userInstance.setNetwork(networkInstance).then(function ( cloudInstancex) {
+                    userInstance.setNetwork(networkInstance).then(function (cloudInstancex) {
 
 
                         logger.debug("DVP-ClusterConfiguration.SetTelcoNetworkToUSer PGSQL");
 
-                        if(!errx)
+                        if (!errx)
                             status = true;
                         var instance = msg.FormatMessage(undefined, "Set Telco Network To User", status, undefined);
                         res.write(instance);
                         res.end();
 
-                    }).catch(function (err){
+                    }).catch(function (err) {
 
-                        status =false;
+                        status = false;
                         var instance = msg.FormatMessage(err, "Set Telco Network To User", status, undefined);
                         res.write(instance);
                         res.end();
@@ -1650,7 +1616,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
                 }
 
 
-            }).catch(function (err){
+            }).catch(function (err) {
 
                 logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToCloud PGSQL CloudEndUser %s NotFound", userID, err);
 
@@ -1670,7 +1636,7 @@ function SetTelcoNetworkToUSer(res, networkId, userID){
             res.end();
         }
 
-    }).catch(function (err){
+    }).catch(function (err) {
 
         logger.error("DVP-ClusterConfiguration.SetTelcoNetworkToUSer PGSQL Network %s NotFound", networkId, err);
 
@@ -1769,16 +1735,16 @@ function CreateEndUser(res,req) {
 
     var provision = 0;
     var status = false;
-    if(req.body){
+    if (req.body) {
 
 
         logger.debug("DVP-ClusterConfiguration.CreateEndUser Object Validated", req.body);
 
 
-        var userData=req.body;
+        var userData = req.body;
 
-        dbmodel.Cloud.find({where: [{ id: userData.ClusterID}, {Activate: true}]}).then(function( cloudObject) {
-            if( cloudObject) {
+        dbmodel.Cloud.find({where: [{id: userData.ClusterID}, {Activate: true}]}).then(function (cloudObject) {
+            if (cloudObject) {
 
 
                 logger.debug("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d Found", userData.ClusterID);
@@ -1811,29 +1777,26 @@ function CreateEndUser(res,req) {
                     .then(function (instance) {
 
 
-
-                            logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser object saved successful');
-                            status = true;
-
-
-                            cloudObject.addCloudEndUser(user).then(function (cloudInstancex) {
-
-                                logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
+                        logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser object saved successful');
+                        status = true;
 
 
-                                if(!errx)
-                                    status = true;
+                        cloudObject.addCloudEndUser(user).then(function (cloudInstancex) {
 
-                            }).catch(function (err){
-
-                                status = false;
-                                var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
-                                res.write(instance);
-                                res.end();
-
-                            });
+                            logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
 
 
+                            if (!errx)
+                                status = true;
+
+                        }).catch(function (err) {
+
+                            status = false;
+                            var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+                        });
 
 
                         try {
@@ -1849,7 +1812,7 @@ function CreateEndUser(res,req) {
                             console.log("There is a error in --> CreateEndUser ", exp);
 
                         }
-                    }).catch(function (err){
+                    }).catch(function (err) {
 
                         logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL CloudEnduser Save Failed ", err);
                         status = false;
@@ -1860,7 +1823,7 @@ function CreateEndUser(res,req) {
                     });
 
             }
-            else{
+            else {
 
                 logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID);
                 var instance = msg.FormatMessage(err, "Create EndUser failed", status, undefined);
@@ -1868,19 +1831,18 @@ function CreateEndUser(res,req) {
                 res.end();
 
             }
-        }).catch(function (err){
+        }).catch(function (err) {
 
             logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID, err);
             var instance = msg.FormatMessage(err, "Create EndUser failed", status, undefined);
             res.write(instance);
             res.end();
 
-            });
-
+        });
 
 
     }
-    else{
+    else {
 
         logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Object Validation failed");
         var instance = msg.FormatMessage(undefined, "Create EndUser failed", status, undefined);
@@ -1892,32 +1854,31 @@ function CreateEndUser(res,req) {
 
 }
 
-function GetEndUsers(req, res){
+function GetEndUsers(req, res) {
 
 
     logger.debug("DVP-ClusterConfiguration.EndUsers HTTP");
 
-    dbmodel.CloudEndUser.findAll().then(function ( enduser) {
+    dbmodel.CloudEndUser.findAll().then(function (enduser) {
 
 
-            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found");
+        logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found");
 
 
-            try {
-                var instance = msg.FormatMessage(undefined, "Get EndUser", true, enduser);
-                res.write(instance);
-                res.end();
-            } catch(exp) {
+        try {
+            var instance = msg.FormatMessage(undefined, "Get EndUser", true, enduser);
+            res.write(instance);
+            res.end();
+        } catch (exp) {
 
 
-
-            }
-
-
-    }).catch(function (err){
+        }
 
 
-        logger.debug("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound",  err);
+    }).catch(function (err) {
+
+
+        logger.debug("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound", err);
         var instance = msg.FormatMessage(err, "Get EndUser failed", false, undefined);
         res.write(instance);
         res.end();
@@ -1930,39 +1891,34 @@ function GetEndUsersByClusterID(req, res, Id) {
     logger.debug("DVP-ClusterConfiguration.GetEndUsersByClusterID HTTP id %d", Id);
 
 
-    dbmodel.Cloud.find({where: [{id: parseInt(Id) }, {Activate: true}], include: [{ model: dbmodel.CloudEndUser, as: "CloudEndUser"}]}).then(function ( cloudInstance) {
+    dbmodel.Cloud.find({
+        where: [{id: parseInt(Id)}, {Activate: true}],
+        include: [{model: dbmodel.CloudEndUser, as: "CloudEndUser"}]
+    }).then(function (cloudInstance) {
 
 
+        var instanceout;
+
+        try {
 
 
-            var instanceout;
-
-            try {
-
-
-                logger.debug("DVP-ClusterConfiguration.GetEndUsersByClusterID PGSQL id %s found", Id);
-                instanceout = msg.FormatMessage(undefined, "Get EndUser by CloudID", true, cloudInstance.CloudEndUser);
+            logger.debug("DVP-ClusterConfiguration.GetEndUsersByClusterID PGSQL id %s found", Id);
+            instanceout = msg.FormatMessage(undefined, "Get EndUser by CloudID", true, cloudInstance.CloudEndUser);
 
 
+        } catch (exp) {
 
-            } catch(exp) {
-
-                logger.error("DVP-ClusterConfiguration.GetEndUsersByClusterID stringify json %s failed", Id, exp);
-                instanceout = msg.FormatMessage(exp, "Get EndUser by CloudID failed", false, undefined);
-
-
-            }
-
-            res.write(instanceout);
-            res.end();
+            logger.error("DVP-ClusterConfiguration.GetEndUsersByClusterID stringify json %s failed", Id, exp);
+            instanceout = msg.FormatMessage(exp, "Get EndUser by CloudID failed", false, undefined);
 
 
+        }
+
+        res.write(instanceout);
+        res.end();
 
 
-
-
-
-    }).catch(function (err){
+    }).catch(function (err) {
 
 
         var instanceout = msg.FormatMessage(err, "Get EndUser by CloudID failed", false, undefined);
@@ -1973,7 +1929,7 @@ function GetEndUsersByClusterID(req, res, Id) {
 
 }
 
-function CreateSipProfile(res, req){
+function CreateSipProfile(res, req) {
 
 
     logger.debug("DVP-ClusterConfiguration.CreateSipProfile HTTP");
@@ -1981,24 +1937,23 @@ function CreateSipProfile(res, req){
 
     var status = false;
 
-    if(req.body) {
+    if (req.body) {
 
 
         logger.error("DVP-ClusterConfiguration.CreateSipProfile Object Validated");
 
 
-
         var userData = req.body;
-        profileHandler.addSipNetworkProfile(userData,function(err, id, sta){
+        profileHandler.addSipNetworkProfile(userData, function (err, id, sta) {
 
-            if(err){
+            if (err) {
 
                 logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile object save Failed");
                 var instance = msg.FormatMessage(err, "Create SipProfile failed", status, undefined);
                 res.write(instance);
                 res.end();
 
-            }else{
+            } else {
 
                 status = true;
                 logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL SipProfile object saved successful');
@@ -2010,8 +1965,7 @@ function CreateSipProfile(res, req){
 
         });
     }
-    else
-    {
+    else {
         logger.error("DVP-ClusterConfiguration.CreateSipProfile Object Validation failed");
         var instance = msg.FormatMessage(undefined, "Create SipProfile done", status, undefined);
         res.write(instance);
@@ -2020,38 +1974,31 @@ function CreateSipProfile(res, req){
     }
 
 
-
 }
 
-function GetProfileByID(res, id){
+function GetProfileByID(res, id) {
 
 
     logger.debug("DVP-ClusterConfiguration.GetProfileByID HTTP");
 
-    dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).then(function ( profile) {
+    dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).then(function (profile) {
 
 
+        logger.debug("DVP-ClusterConfiguration.GetProfileByID PGSQL SipProfile %s Found", id);
 
 
-            logger.debug("DVP-ClusterConfiguration.GetProfileByID PGSQL SipProfile %s Found", id);
+        try {
+            var instance = msg.FormatMessage(undefined, "Get Profile ByID", true, profile);
+            res.write(instance);
+            res.end();
+        } catch (exp) {
+
+            //res.write("");
+
+        }
 
 
-            try {
-                var instance = msg.FormatMessage(undefined, "Get Profile ByID", true, profile);
-                res.write(instance);
-                res.end();
-            } catch(exp) {
-
-                //res.write("");
-
-            }
-
-
-
-
-
-
-    }).catch(function (err){
+    }).catch(function (err) {
 
 
         logger.debug("DVP-ClusterConfiguration.GetProfileByID PGSQL SipProfile %s NotFound", id, err);
@@ -2064,7 +2011,7 @@ function GetProfileByID(res, id){
     });
 }
 
-function GetProfiles(req, res){
+function GetProfiles(req, res) {
 
 
     logger.debug("DVP-ClusterConfiguration.GetProfiles HTTP");
@@ -2072,30 +2019,24 @@ function GetProfiles(req, res){
     dbmodel.SipNetworkProfile.findAll().then(function (profile) {
 
 
+        logger.debug("DVP-ClusterConfiguration.GetProfiles PGSQL SipProfile Found");
 
 
-            logger.debug("DVP-ClusterConfiguration.GetProfiles PGSQL SipProfile Found");
+        try {
+            var instance = msg.FormatMessage(undefined, "Get Profiles", true, profile);
+            res.write(instance);
+            res.end();
+        } catch (exp) {
+
+            //res.write("");
+
+        }
 
 
-            try {
-                var instance = msg.FormatMessage(undefined, "Get Profiles", true, profile);
-                res.write(instance);
-                res.end();
-            } catch(exp) {
-
-                //res.write("");
-
-            }
+    }).catch(function (err) {
 
 
-
-
-
-
-    }).catch(function(err){
-
-
-        logger.debug("DVP-ClusterConfiguration.GetProfiles PGSQL SipProfile NotFound",  err);
+        logger.debug("DVP-ClusterConfiguration.GetProfiles PGSQL SipProfile NotFound", err);
 
 
         var instance = msg.FormatMessage(err, "Get Profiles failed", true, undefined);
@@ -2105,7 +2046,7 @@ function GetProfiles(req, res){
     });
 }
 
-function AssignSipProfileToCallServer(res, profileid, callserverID){
+function AssignSipProfileToCallServer(res, profileid, callserverID) {
 
 
     var status = false;
@@ -2114,31 +2055,31 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
     dbmodel.CallServer.find({where: [{id: callserverID}, {Activate: true}]}).complete(function (csInstance) {
 
-        if ( csInstance) {
+        if (csInstance) {
 
 
-           // csInstance.getIPAddress();
+            // csInstance.getIPAddress();
 
 
             try {
                 //var instance = JSON.stringify(csInstance);
 
-               // res.write(instance);
+                // res.write(instance);
 
-                profileHandler.addNetworkProfileToCallServer(profileid,callserverID,function(err, id, sta){
+                profileHandler.addNetworkProfileToCallServer(profileid, callserverID, function (err, id, sta) {
 
-                    if(err){
+                    if (err) {
 
-                        logger.error("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d failed", profileid, callserverID, err );
+                        logger.error("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d failed", profileid, callserverID, err);
                         var instance = msg.FormatMessage(err, "Assign SipProfile To CallServer", status, undefined);
                         res.write(instance);
                         res.end();
 
-                    }else{
+                    } else {
 
                         status = true;
-                        logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d ", profileid, callserverID );
-                        redisClient.publish("CSCOMMAND:"+csInstance.Code+":profile", profileid, redis.print);
+                        logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d ", profileid, callserverID);
+                        redisClient.publish("CSCOMMAND:" + csInstance.Code + ":profile", profileid, redis.print);
                         var instance = msg.FormatMessage(undefined, "Assign SipProfile To CallServer", status, undefined);
                         res.write(instance);
                         res.end();
@@ -2147,7 +2088,7 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
 
                 });
 
-            } catch(exp) {
+            } catch (exp) {
 
                 var instance = msg.FormatMessage(undefined, "Assign SipProfile To CallServer", status, undefined);
                 res.write(instance);
@@ -2163,33 +2104,26 @@ function AssignSipProfileToCallServer(res, profileid, callserverID){
         }
 
 
-
-    }).catch(function (err){
+    }).catch(function (err) {
 
         var instance = msg.FormatMessage(err, "Assign SipProfile To CallServer", status, undefined);
         res.write(instance);
         res.end();
 
 
-
     });
-
-
-
-
 
 
 };
 
-function AssignSipProfiletoEndUser(res, profileid, enduserID){
-
+function AssignSipProfiletoEndUser(res, profileid, enduserID) {
 
 
     logger.debug("DVP-ClusterConfiguration.AssignSipProfiletoEndUser HTTP");
 
     var status = false;
 
-    dbmodel.CloudEndUser.find({where: [{id: enduserID}]}).then(function ( enduser) {
+    dbmodel.CloudEndUser.find({where: [{id: enduserID}]}).then(function (enduser) {
 
         if (enduser) {
 
@@ -2199,19 +2133,19 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
                 // res.write(instance);
 
-                profileHandler.addNetworkProfiletoEndUser(profileid,enduserID,function(err, id, sta){
+                profileHandler.addNetworkProfiletoEndUser(profileid, enduserID, function (err, id, sta) {
 
-                    if(err){
+                    if (err) {
 
-                        logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d ", profileid, enduserID );
+                        logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d ", profileid, enduserID);
                         var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
                         res.write(instance);
                         res.end();
 
-                    }else{
+                    } else {
 
                         status = true;
-                        logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d failed", profileid, enduserID, err );
+                        logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d failed", profileid, enduserID, err);
                         //redisClient.publish("CSCOMMAND:"+csInstance.Name+":profile", JSON.stringify(id), redis.print);
                         var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
                         res.write(instance);
@@ -2221,7 +2155,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
 
                 });
 
-            } catch(exp) {
+            } catch (exp) {
 
                 var instance = msg.FormatMessage(exp, "Assign SipProfile to EndUser", status, undefined);
                 res.write(instance);
@@ -2237,8 +2171,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID){
         }
 
 
-
-    }).catch(function (err){
+    }).catch(function (err) {
 
         var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
         res.write(instance);
@@ -2272,7 +2205,7 @@ module.exports.StoreIPAddressDetails = StoreIPAddressDetails;
 module.exports.GetProfileByID = GetProfileByID;
 module.exports.GetCallServers = GetCallServers;
 module.exports.GetProfiles = GetProfiles;
-module.exports.GetNetworkByClusterID =GetNetworkByClusterID;
+module.exports.GetNetworkByClusterID = GetNetworkByClusterID;
 module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
 module.exports.EditCluster = EditCluster;
 module.exports.EditCallServer = EditCallServer;
