@@ -23,10 +23,7 @@ function GetClusterByID(res, Id) {
 
     dbmodel.Cloud.find({
         where: [{id: parseInt(Id)}, {Activate: true}],
-        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {
-            model: dbmodel.CallServer,
-            as: "CallServer"
-        }, {model: dbmodel.Network, as: "Network"}]
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {model: dbmodel.CallServer, as: "CallServer",  where: [{Activate: true}]}, {model: dbmodel.Network, as: "Network"}]
     }).then(function (cloudInstance) {
 
 
@@ -69,10 +66,7 @@ function GetClusters(req, res) {
 
     dbmodel.Cloud.findAll({
         where: [{Activate: true}],
-        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {
-            model: dbmodel.CallServer,
-            as: "CallServer"
-        }, {model: dbmodel.Network, as: "Network"}]
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {model: dbmodel.CallServer, as: "CallServer",  where: [{Active: true}]}, {model: dbmodel.Network, as: "Network"}]
     }).then(function (cloudInstance) {
 
 
