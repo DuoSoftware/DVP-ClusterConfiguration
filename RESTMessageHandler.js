@@ -762,7 +762,6 @@ function EditCallServer(Id, req, res) {
 
 }
 
-
 function ActivateCallServer(res, id, activate) {
 
 
@@ -1160,6 +1159,107 @@ function GetNetworks(req, res) {
     });
 
 }
+
+function GetNetwork(id, req, res) {
+
+    logger.debug("DVP-ClusterConfiguration.GetNetwork HTTP");
+
+    dbmodel.Network.find({where: [{id: id}]}).then(function (network) {
+
+
+        logger.debug("DVP-ClusterConfiguration.GetNetwork PGSQL Network Found");
+
+
+        try {
+            var instance = msg.FormatMessage(undefined, "Get Network", true, network);
+            res.write(instance);
+
+
+        } catch (exp) {
+
+
+        }
+
+
+        res.end();
+    }).catch(function (err) {
+
+        logger.debug("DVP-ClusterConfiguration.GetNetwork PGSQL Network NotFound", err);
+
+
+        var instance = msg.FormatMessage(err, "Get Network", false, undefined);
+        res.write(instance);
+
+        res.end();
+
+    });
+
+}
+
+function DeleteNetwork(id, req, res) {
+
+    logger.debug("DVP-ClusterConfiguration.GetNetwork HTTP");
+
+    dbmodel.Network.find({where: [{id: id}]}).then(function (network) {
+
+
+        logger.debug("DVP-ClusterConfiguration.GetNetwork PGSQL Network Found");
+
+
+        try {
+
+            if(network){
+
+                network.destroy().then(function (obj){
+
+                    var instance = msg.FormatMessage(undefined, "Delete Network succeed", true, obj);
+                    res.write(instance);
+                    res.end();
+
+
+                }).catch(function(err){
+
+                    var instance = msg.FormatMessage(err, "Delete Network", false, undefined);
+                    res.write(instance);
+                    res.end();
+
+
+                });
+
+
+            }
+            else {
+
+                var instance = msg.FormatMessage(undefined, "Delete Network, No network found", false, undefined);
+                res.write(instance);
+                res.end();
+            }
+
+
+        } catch (exp) {
+
+            var instance = msg.FormatMessage(exp, "Delete Network exception recived", false, undefined);
+            res.write(instance);
+            res.end();
+
+        }
+
+
+        res.end();
+    }).catch(function (err) {
+
+        logger.debug("DVP-ClusterConfiguration.GetNetwork PGSQL Network NotFound", err);
+
+
+        var instance = msg.FormatMessage(err, "Get Network", false, undefined);
+        res.write(instance);
+
+        res.end();
+
+    });
+
+}
+
 
 function GetNetworkByClusterID(req, res, Id) {
 
@@ -2144,6 +2244,8 @@ module.exports.SetTelcoNetworkToCloud = SetTelcoNetworkToCloud;
 module.exports.CreateEndUserNetwork = CreateEndUserNetwork;
 module.exports.SetTelcoNetworkToUSer = SetTelcoNetworkToUSer;
 module.exports.GetNetworks = GetNetworks;
+module.exports.GetNetwork = GetNetwork;
+module.exports.DeleteNetwork = DeleteNetwork;
 module.exports.CreateEndUser = CreateEndUser;
 module.exports.GetEndUsers = GetEndUsers;
 module.exports.CreateSipProfile = CreateSipProfile;

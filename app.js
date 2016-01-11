@@ -210,6 +210,18 @@ server.get('/DVP/API/:version/CloudConfiguration/Networks', function( req, res, 
 } );
 
 
+server.get('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
+    restMessageHandler.GetNetwork(req.params.id,req,res);
+    return next();
+} );
+
+server.del('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
+    restMessageHandler.DeleteNetwork(req.params.id,req,res);
+    return next();
+} );
+
+
+
 server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', function( req, res, next){
     restMessageHandler.GetNetworkByClusterID(req, res, req.params.id);
     return next();
