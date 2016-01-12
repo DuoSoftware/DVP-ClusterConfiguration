@@ -23,7 +23,7 @@ function GetClusterByID(res, Id) {
 
     dbmodel.Cloud.find({
         where: [{id: parseInt(Id)}, {Activate: true}],
-        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {model: dbmodel.CallServer, as: "CallServer",  where: [{Activate: true}]}, {model: dbmodel.Network, as: "Network"}]
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {model: dbmodel.CallServer, as: "CallServer"}, {model: dbmodel.Network, as: "Network"}]
     }).then(function (cloudInstance) {
 
 
@@ -66,7 +66,7 @@ function GetClusters(req, res) {
 
     dbmodel.Cloud.findAll({
         where: [{Activate: true}],
-        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {model: dbmodel.CallServer, as: "CallServer",  where: [{Active: true}]}, {model: dbmodel.Network, as: "Network"}]
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {model: dbmodel.CallServer, as: "CallServer"}, {model: dbmodel.Network, as: "Network"}]
     }).then(function (cloudInstance) {
 
 
@@ -1245,7 +1245,7 @@ function DeleteNetwork(id, req, res) {
         }
 
 
-        res.end();
+
     }).catch(function (err) {
 
         logger.debug("DVP-ClusterConfiguration.GetNetwork PGSQL Network NotFound", err);
@@ -1358,7 +1358,7 @@ function CreateTelcoNetwork(res, req) {
 
                 try {
 
-                    var instance = msg.FormatMessage(err, "Create Telco Network", status, undefined);
+                    var instance = msg.FormatMessage(undefined, "Create Telco Network", status, instance);
                     res.write(instance);
                     res.end();
 
@@ -1451,7 +1451,7 @@ function CreateEndUserNetwork(res, req) {
 
                 try {
 
-                    var instance = msg.FormatMessage(err, "Create User Network", status, undefined);
+                    var instance = msg.FormatMessage(undefined, "Create User Network", status, instance);
                     res.write(instance);
                     res.end();
 
