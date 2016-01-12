@@ -1260,7 +1260,6 @@ function DeleteNetwork(id, req, res) {
 
 }
 
-
 function GetNetworkByClusterID(req, res, Id) {
 
     logger.debug("DVP-ClusterConfiguration.GetNetworkByClusterID HTTP id %d", Id);
@@ -1484,6 +1483,110 @@ function CreateEndUserNetwork(res, req) {
 
     }
 
+
+}
+
+function EditNetwork(id, req, res) {
+
+    logger.debug("DVP-ClusterConfiguration.EditNetwork HTTP");
+
+    dbmodel.Network.find({where: [{id: id}]}).then(function (network) {
+
+
+        logger.debug("DVP-ClusterConfiguration.EditNetwork PGSQL Network Found");
+
+        if(network) {
+
+            try {
+
+
+                var status = false;
+                if (req.body) {
+
+                    logger.debug("DVP-ClusterConfiguration.EditNetwork Object Validated");
+
+
+                    var networkData = req.body;
+
+
+                    network.updateAttributes({
+
+
+                        Mask: networkData.Mask,
+                        NATIP: networkData.NATIP
+
+
+                    }).then(function (instance) {
+
+
+                        logger.debug('DVP-ClusterConfiguration.EditNetwork PGSQL Network object updated successful');
+                        status = true;
+
+
+                        try {
+
+                            var instance = msg.FormatMessage(err, "Update User Network success", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+
+                        }
+                        catch (exp) {
+
+                            console.log("There is a error in --> Edit Network ", exp)
+
+                        }
+                    }).catch(function (err) {
+
+                        logger.error("DVP-ClusterConfiguration.EditNetwork PGSQL Network Update Failed ", err);
+                        var instance = msg.FormatMessage(err, "Update User Network error", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+
+                    });
+
+
+                }
+                else {
+
+                    logger.error("DVP-ClusterConfiguration.CreateEndUserNetwork Object Validation Failed");
+                    var instance = msg.FormatMessage(undefined, "Update User Network error", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+                }
+
+
+            } catch (exp) {
+
+                var instance = msg.FormatMessage(err, "Edit Network error", false, undefined);
+                res.write(instance);
+
+                res.end();
+
+
+            }
+        }else
+        {
+            var instance = msg.FormatMessage(undefined, "Edit Network, Network not found", false, undefined);
+            res.write(instance);
+
+            res.end();
+
+        }
+
+    }).catch(function (err) {
+
+        logger.debug("DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL Network NotFound", err);
+
+
+        var instance = msg.FormatMessage(err, "Edit Network, Network not found", false, undefined);
+        res.write(instance);
+
+        res.end();
+
+    });
 
 }
 
@@ -2262,3 +2365,4 @@ module.exports.EditCallServer = EditCallServer;
 module.exports.RemoveCallServerFromCloud = RemoveCallServerFromCloud;
 module.exports.RemoveTelcoNetworkFromCloud = RemoveTelcoNetworkFromCloud;
 module.exports.RemoveTelcoNetworkFromUser = RemoveTelcoNetworkFromUser;
+module.exports.EditNetwork = EditNetwork;
