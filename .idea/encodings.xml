@@ -4,8 +4,17 @@
     <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/css/clusterLayout.css" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/partials/clusterConfig.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/partials/clusterConfigList.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/partials/clusterEdit.html" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/partials/clusterList.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/scripts/app.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/scripts/controllers/chipController.js" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-ClusterApp/scripts/services/clusterService.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/index.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/partials/networkAdd.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/partials/networkEdit.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/partials/networkList.html" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/scripts/app.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/scripts/controllers/networkController.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/../../WebstormProjects/DVP-Apps/DVP-NetworkApp/scripts/directives/taskDirective.js" charset="UTF-8" />
   </component>
 </project>
