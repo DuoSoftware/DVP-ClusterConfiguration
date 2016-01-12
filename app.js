@@ -215,6 +215,13 @@ server.get('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, re
     return next();
 } );
 
+
+server.put('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
+    restMessageHandler.EditNetwork(req.params.id,req,res);
+    return next();
+} );
+
+
 server.del('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
     restMessageHandler.DeleteNetwork(req.params.id,req,res);
     return next();
