@@ -2375,13 +2375,12 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID) {
 
     });
 
-};
+}
 
 module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
 module.exports.GetClusters = GetClusters;
-modele.exports.GetActiveCallserversByClusterID = GetActiveCallserversByClusterID;
 module.exports.ActivateCloud = ActivateCloud;
 module.exports.CreateCallServer = CreateCallServer;
 module.exports.ActivateCallServer = ActivateCallServer;
@@ -2412,3 +2411,4 @@ module.exports.RemoveCallServerFromCloud = RemoveCallServerFromCloud;
 module.exports.RemoveTelcoNetworkFromCloud = RemoveTelcoNetworkFromCloud;
 module.exports.RemoveTelcoNetworkFromUser = RemoveTelcoNetworkFromUser;
 module.exports.EditNetwork = EditNetwork;
+module.exports.GetActiveCallserversByClusterID = GetActiveCallserversByClusterID;
