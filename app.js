@@ -85,6 +85,14 @@ server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
     return next();
 } );
 
+server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id/ActiveCallservers', function( req, res, next){
+    restMessageHandler.GetActiveCallserversByClusterID(res, req.params.id);
+    return next();
+} );
+
+
+
+
 server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res, next){
     restMessageHandler.EditCluster(req.params.id,req,res);
     return next();

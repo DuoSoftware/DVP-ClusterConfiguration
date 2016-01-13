@@ -100,6 +100,51 @@ function GetClusters(req, res) {
 
 }
 
+
+function GetActiveCallserversByClusterID(req, res) {
+
+
+    logger.debug("DVP-ClusterConfiguration.GetClusters HTTP");
+
+
+    dbmodel.Cloud.findAll({
+        where: [{Activate: true}],
+        include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {
+            model: dbmodel.CallServer,
+            as: "CallServer",
+            where: [{Activate: true}]
+        }, {model: dbmodel.Network, as: "Network"}]
+    }).then(function (cloudInstance) {
+
+
+        try {
+
+
+            var instance = msg.FormatMessage(undefined, "Cluster Found", true, cloudInstance);
+
+            logger.debug("DVP-ClusterConfiguration.GetClusters PGSQL  found");
+            res.write(instance);
+        } catch (exp) {
+
+            logger.error("DVP-ClusterConfiguration.GetClusters stringify json failed", exp);
+
+
+            res.write("");
+
+        }
+        res.end();
+
+    }).catch(function (err) {
+
+
+        logger.error("DVP-ClusterConfiguration.GetClusters PGSQL failed", err);
+        res.write(msg.FormatMessage(err, "Cluster NotFound", false, undefined));
+
+    });
+
+}
+
+
 function EditCluster(Id, req, res, next) {
 
 
@@ -2336,6 +2381,7 @@ module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
 module.exports.GetClusters = GetClusters;
+modele.exports.GetActiveCallserversByClusterID = GetActiveCallserversByClusterID;
 module.exports.ActivateCloud = ActivateCloud;
 module.exports.CreateCallServer = CreateCallServer;
 module.exports.ActivateCallServer = ActivateCallServer;
