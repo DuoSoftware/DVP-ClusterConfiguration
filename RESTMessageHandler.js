@@ -1570,7 +1570,7 @@ function EditNetwork(id, req, res) {
 
                         try {
 
-                            var instance = msg.FormatMessage(err, "Update User Network success", status, undefined);
+                            var instance = msg.FormatMessage(undefined, "Update User Network success", status, instance);
                             res.write(instance);
                             res.end();
 
@@ -1579,7 +1579,7 @@ function EditNetwork(id, req, res) {
                         catch (exp) {
 
                             console.log("There is a error in --> Edit Network ", exp)
-
+                            res.end();
                         }
                     }).catch(function (err) {
 
