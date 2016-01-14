@@ -333,6 +333,13 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
     return next();
 } );
 
+server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',function( req, res, next){
+    restMessageHandler.GetIPAddresses(res, req);
+    return next();
+} );
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //var basepath = 'http://'+ host;

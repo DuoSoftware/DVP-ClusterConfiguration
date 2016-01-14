@@ -2785,6 +2785,39 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID) {
 
 }
 
+
+function GetIPAddresses(req, res) {
+
+
+    logger.error("DVP-ClusterConfiguration.GetIPAddresses");
+
+    dbmodel.IPAddress.findAll().then(function (ipAddresses) {
+
+
+        logger.error("DVP-ClusterConfiguration.GetIPAddresses IP found");
+        var instance = msg.FormatMessage(undefined, "IPAddress found", true, ipAddresses);
+        res.write(instance);
+        res.end();
+
+
+    }).catch(function (err) {
+
+        logger.error("DVP-ClusterConfiguration.GetIPAddresses No IPs found");
+        var instance = msg.FormatMessage(err, "Update SipProfile failed, no IPs found", false, undefined);
+        res.write(instance);
+        res.end();
+
+    });
+}
+
+
+
+
+
+
+
+
+
 module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
@@ -2808,6 +2841,7 @@ module.exports.CreateSipProfile = CreateSipProfile;
 module.exports.AssignSipProfileToCallServer = AssignSipProfileToCallServer;
 module.exports.AssignSipProfiletoEndUser = AssignSipProfiletoEndUser;
 module.exports.StoreIPAddressDetails = StoreIPAddressDetails;
+module.exports.GetIPAddresses = GetIPAddresses;
 module.exports.GetProfileByID = GetProfileByID;
 module.exports.GetCallServers = GetCallServers;
 module.exports.GetProfiles = GetProfiles;
@@ -2827,3 +2861,4 @@ module.exports.UpdateProfileByID = UpdateProfileByID;
 //Pawan
 module.exports.UpdateEndUser = UpdateEndUser;
 module.exports.DeleteEndUser = DeleteEndUser;
+
