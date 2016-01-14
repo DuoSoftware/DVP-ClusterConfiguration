@@ -2282,7 +2282,76 @@ function CreateSipProfile(res, req) {
         logger.error("DVP-ClusterConfiguration.CreateSipProfile Object Validated");
 
 
-        var userData = req.body;
+        var profileInfo = req.body;
+
+
+        var profile = dbmodel.SipNetworkProfile.build({
+            ProfileName: profileInfo.ProfileName,
+            MainIp: profileInfo.MainIp,
+            InternalIp: profileInfo.InternalIp,
+            InternalRtpIp: profileInfo.InternalRtpIp,
+            ExternalIp: profileInfo.ExternalIp,
+            ExternalRtpIp: profileInfo.ExternalRtpIp,
+            Port: profileInfo.Port,
+            ObjClass: profileInfo.ObjClass,
+            ObjType: profileInfo.ObjType,
+            ObjCategory: profileInfo.ObjCategory,
+            CompanyId: profileInfo.CompanyId,
+            TenantId: profileInfo.TenantId
+        });
+
+
+
+        dbmodel.IPAddress.find({where: [{IP: profileInfo.InternalIp}]}).then(function (ipAddress) {
+
+            if(ipAddress && ipAddress.IsAllocated){
+
+                profile
+                    .save()
+                    .then(function (obj) {
+
+                        logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile save Failed");
+                        var instance = msg.FormatMessage(err, "Create SipProfile failed", status, obj);
+                        res.write(instance);
+                        res.end();
+
+
+                    }).catch(function(err){
+
+                        logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile save Failed");
+                        var instance = msg.FormatMessage(err, "Create SipProfile failed", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+
+                    });
+
+
+
+            }else{
+
+                logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile profile find Failed");
+                var instance = msg.FormatMessage(undefined, "Create SipProfile, Profile find failed", status, undefined);
+                res.write(instance);
+                res.end();
+
+            }
+
+        }).catch(function(err){
+
+            logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile object save Failed");
+            var instance = msg.FormatMessage(err, "Create SipProfile failed", status, undefined);
+            res.write(instance);
+            res.end();
+
+
+
+
+        });
+
+
+
+        /*
         profileHandler.addSipNetworkProfile(userData, function (err, id, sta) {
 
             if (err) {
@@ -2303,6 +2372,8 @@ function CreateSipProfile(res, req) {
             }
 
         });
+
+        */
     }
     else {
         logger.error("DVP-ClusterConfiguration.CreateSipProfile Object Validation failed");
@@ -2453,8 +2524,6 @@ function DeleteProfileByID(id, req, res){
     });
 }
 
-
-
 function UpdateProfileByID(id, req, res){
 
 
@@ -2580,7 +2649,6 @@ function UpdateProfileByID(id, req, res){
 
     });
 }
-
 
 function AssignSipProfileToCallServer(res, profileid, callserverID) {
 
