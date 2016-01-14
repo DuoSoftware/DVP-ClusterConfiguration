@@ -255,6 +255,18 @@ server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',function( req, r
     return next();
 } );
 
+// Pawan
+server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req, res, next){
+    restMessageHandler.UpdateEndUser(res, req);
+    return next();
+} );
+
+// Pawan
+server.del('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req, res, next){
+    restMessageHandler.DeleteEndUser(res, req.params.id);
+    return next();
+} );
+
 server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', function( req, res, next){
     restMessageHandler.GetEndUsers(req, res);
     return next();
