@@ -296,6 +296,16 @@ server.get('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, re
     return next();
 } );
 
+server.del('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
+    restMessageHandler.DeleteProfileByID(req.params.id,req,res);
+    return next();
+} );
+
+server.put('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
+    restMessageHandler.UpdateProfileByID(req.params.id,req,res);
+    return next();
+} );
+
 
 server.get('/DVP/API/:version/CloudConfiguration/Profiles', function( req, res, next){
     restMessageHandler.GetProfiles(req,res);

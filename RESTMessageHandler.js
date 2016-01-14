@@ -2242,6 +2242,203 @@ function GetProfiles(req, res) {
     });
 }
 
+function DeleteProfileByID(id, req, res){
+
+
+    logger.debug("DVP-ClusterConfiguration.DeleteProfileByID HTTP");
+
+    dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).then(function (profile) {
+
+
+        logger.debug("DVP-ClusterConfiguration.DeleteProfileByID PGSQL SipProfile %s Found", id);
+
+
+        try {
+
+
+            if(profile){
+
+                profile.destroy().then(function (obj){
+
+                    var instance = msg.FormatMessage(undefined, "Delete Profile succeed", true, obj);
+                    res.write(instance);
+                    res.end();
+
+
+                }).catch(function(err){
+
+                    var instance = msg.FormatMessage(err, "Delete Profile", false, undefined);
+                    res.write(instance);
+                    res.end();
+
+
+                });
+
+
+            }
+            else {
+
+                var instance = msg.FormatMessage(undefined, "Delete Profile, No Profile found", false, undefined);
+                res.write(instance);
+                res.end();
+            }
+
+
+
+
+
+
+
+
+        } catch (exp) {
+
+            //res.write("");
+
+        }
+
+
+    }).catch(function (err) {
+
+
+        logger.debug("DVP-ClusterConfiguration.DeleteProfileByID PGSQL SipProfile %s NotFound", id, err);
+
+
+        var instance = msg.FormatMessage(err, "Delete Profile ByID failed", false, undefined);
+        res.write(instance);
+        res.end();
+
+    });
+}
+
+
+
+function UpdateProfileByID(id, req, res){
+
+
+    logger.debug("DVP-ClusterConfiguration.UpdateProfileByID HTTP");
+
+    dbmodel.SipNetworkProfile.find({where: [{id: parseInt(id)}]}).then(function (profile) {
+
+
+        logger.debug("DVP-ClusterConfiguration.UpdateProfileByID PGSQL SipProfile %s Found", id);
+
+
+        try {
+
+
+            if(profile){
+
+                var status = false;
+
+                if (req.body) {
+
+
+                    logger.error("DVP-ClusterConfiguration.UpdateProfileByID Object Validated");
+
+
+                    var userData = req.body;
+
+
+                    dbmodel.IPAddress.find({where: [{IP: userData.InternalIp}]}).then(function (ipAddress) {
+
+                        if(ipAddress && ipAddress.IsAllocated){
+
+                            userData.updateAttributes({
+                                ProfileName: userData.ProfileName,
+                                MainIp: userData.MainIp,
+                                InternalIp: userData.InternalIp,
+                                InternalRtpIp: userData.InternalRtpIp,
+                                ExternalIp: userData.ExternalIp,
+                                ExternalRtpIp: userData.ExternalRtpIp,
+                                Port: userData.Port,
+                                ObjClass: userData.ObjClass,
+                                ObjType: userData.ObjType,
+                                ObjCategory: userData.ObjCategory
+                            }).then(function (obj) {
+                                    try {
+
+
+
+                                            logger.error("DVP-ClusterConfiguration.UpdateProfileByID success");
+                                            var instance = msg.FormatMessage(undefined, "Update SipProfile done", false, obj);
+                                            res.write(instance);
+
+                                    }
+                                    catch (ex) {
+                                        logger.error("DVP-ClusterConfiguration.UpdateProfileByID Object Validation failed");
+                                        var instance = msg.FormatMessage(undefined, "Update SipProfile failed", false, undefined);
+                                        res.write(instance);
+                                        res.end();
+                                    }
+
+                                }).catch(function(err){
+
+
+                                logger.error("DVP-ClusterConfiguration.UpdateProfileByID update error");
+                                var instance = msg.FormatMessage(err, "Update SipProfile failed", false, undefined);
+                                res.write(instance);
+                                res.end();
+
+                            });
+
+
+
+                        }else{
+
+                            logger.error("DVP-ClusterConfiguration.UpdateProfileByID No IP found");
+                            var instance = msg.FormatMessage(undefined, "Update SipProfile failed, no ip found", false, undefined);
+                            res.write(instance);
+                            res.end();
+
+                        }
+
+                    }).catch(function(err){
+
+                        logger.error("DVP-ClusterConfiguration.UpdateProfileByID No IP found");
+                        var instance = msg.FormatMessage(err, "Update SipProfile failed, no ip found", false, undefined);
+                        res.write(instance);
+                        res.end();
+
+                    });
+                }
+                else {
+                    logger.error("DVP-ClusterConfiguration.UpdateProfileByID Object Validation failed");
+                    var instance = msg.FormatMessage(undefined, "Update SipProfile done", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+                }
+
+            }
+            else {
+
+                var instance = msg.FormatMessage(undefined, "Delete Profile, No Profile found", false, undefined);
+                res.write(instance);
+                res.end();
+            }
+
+
+        } catch (exp) {
+
+            //res.write("");
+
+        }
+
+
+    }).catch(function (err) {
+
+
+        logger.debug("DVP-ClusterConfiguration.DeleteProfileByID PGSQL SipProfile %s NotFound", id, err);
+
+
+        var instance = msg.FormatMessage(err, "Delete Profile ByID failed", false, undefined);
+        res.write(instance);
+        res.end();
+
+    });
+}
+
+
 function AssignSipProfileToCallServer(res, profileid, callserverID) {
 
 
@@ -2412,3 +2609,5 @@ module.exports.RemoveTelcoNetworkFromCloud = RemoveTelcoNetworkFromCloud;
 module.exports.RemoveTelcoNetworkFromUser = RemoveTelcoNetworkFromUser;
 module.exports.EditNetwork = EditNetwork;
 module.exports.GetActiveCallserversByClusterID = GetActiveCallserversByClusterID;
+module.exports.DeleteProfileByID = DeleteProfileByID;
+module.exports.UpdateProfileByID = UpdateProfileByID;
