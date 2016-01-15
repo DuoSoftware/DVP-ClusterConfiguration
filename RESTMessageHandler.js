@@ -453,7 +453,7 @@ function StoreIPAddressDetails(res, req) {
             }
 
 
-        }).then(function (err) {
+        }).catch(function (err) {
 
             logger.error("DVP-ClusterConfiguration.StoreIPAddressDetails PGSQL CallServer NotFound", err);
             var instance = msg.FormatMessage(undefined, "Store IPAddress", status, undefined);
