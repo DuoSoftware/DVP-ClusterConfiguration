@@ -2311,7 +2311,7 @@ function CreateSipProfile(res, req) {
                     .then(function (obj) {
 
                         logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile save Failed");
-                        var instance = msg.FormatMessage(err, "Create SipProfile failed", status, obj);
+                        var instance = msg.FormatMessage(undefined, "Create SipProfile failed", true, obj);
                         res.write(instance);
                         res.end();
 
@@ -2555,7 +2555,7 @@ function UpdateProfileByID(id, req, res){
 
                         if(ipAddress && ipAddress.IsAllocated){
 
-                            userData.updateAttributes({
+                            profile.updateAttributes({
                                 ProfileName: userData.ProfileName,
                                 MainIp: userData.MainIp,
                                 InternalIp: userData.InternalIp,
@@ -2572,9 +2572,9 @@ function UpdateProfileByID(id, req, res){
 
 
                                             logger.error("DVP-ClusterConfiguration.UpdateProfileByID success");
-                                            var instance = msg.FormatMessage(undefined, "Update SipProfile done", false, obj);
+                                            var instance = msg.FormatMessage(undefined, "Update SipProfile done", true, obj);
                                             res.write(instance);
-
+                                        res.end();
                                     }
                                     catch (ex) {
                                         logger.error("DVP-ClusterConfiguration.UpdateProfileByID Object Validation failed");
@@ -2786,7 +2786,7 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID) {
 }
 
 
-function GetIPAddresses(req, res) {
+function GetIPAddresses(res, req) {
 
 
     logger.error("DVP-ClusterConfiguration.GetIPAddresses");
