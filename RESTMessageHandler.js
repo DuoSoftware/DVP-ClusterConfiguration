@@ -744,7 +744,7 @@ function EditCallServer(Id, req, res) {
                     Class: csData.Class,
                     Type: csData.Type,
                     Category: csData.Category,
-                    InternalMainIP: csData.InternalIP
+                    InternalMainIP: csData.InternalMainIP
 
                 }).then(function (instance) {
 
