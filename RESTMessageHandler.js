@@ -2662,39 +2662,53 @@ function AssignSipProfileToCallServer(res, profileid, callserverID) {
         if (csInstance) {
 
 
-            // csInstance.getIPAddress();
-
-
             try {
-                //var instance = JSON.stringify(csInstance);
 
-                // res.write(instance);
 
-                profileHandler.addNetworkProfileToCallServer(profileid, callserverID, function (err, id, sta) {
+                dbmodel.SipNetworkProfile.find({where: [{id: profileid}]}).then(function (profRec) {
+                    if (csInstance) {
 
-                    if (err) {
+                        csInstance.addSipNetworkProfile(profRec).then(function (result) {
 
+                            status = true;
+                            logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d ", profileid, callserverID);
+                            redisClient.publish("CSCOMMAND:" + csInstance.Code + ":profile", profileid, redis.print);
+                            var instance = msg.FormatMessage(undefined, "Assign SipProfile To CallServer", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+
+
+                        }).catch(function(ex){
+
+                            logger.error("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d failed", profileid, callserverID, err);
+                            var instance = msg.FormatMessage(ex, "Assign SipProfile To CallServer", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+
+                        });
+                    }
+                    else {
                         logger.error("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d failed", profileid, callserverID, err);
                         var instance = msg.FormatMessage(err, "Assign SipProfile To CallServer", status, undefined);
                         res.write(instance);
                         res.end();
-
-                    } else {
-
-                        status = true;
-                        logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d ", profileid, callserverID);
-                        redisClient.publish("CSCOMMAND:" + csInstance.Code + ":profile", profileid, redis.print);
-                        var instance = msg.FormatMessage(undefined, "Assign SipProfile To CallServer", status, undefined);
-                        res.write(instance);
-                        res.end();
-
                     }
+
+                }).catch(function (ex) {
+
+                    logger.error("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d failed", profileid, callserverID, err);
+                    var instance = msg.FormatMessage(ex, "Assign SipProfile To CallServer", status, undefined);
+                    res.write(instance);
+                    res.end();
 
                 });
 
+
             } catch (exp) {
 
-                var instance = msg.FormatMessage(undefined, "Assign SipProfile To CallServer", status, undefined);
+                var instance = msg.FormatMessage(exp, "Assign SipProfile To CallServer", status, undefined);
                 res.write(instance);
                 res.end();
 
@@ -2733,31 +2747,48 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID) {
 
 
             try {
-                //var instance = JSON.stringify(csInstance);
 
-                // res.write(instance);
+                    dbmodel.SipNetworkProfile.find({where: [{id: profileid}]}).then(function (nw)
+                    {
+                        if (nw)
+                        {
 
-                profileHandler.addNetworkProfiletoEndUser(profileid, enduserID, function (err, id, sta) {
+                            enduser.setSipNetworkProfile(nw).then(function (result)
+                            {
 
-                    if (err) {
+                                status = true;
+                                logger.debug("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d", profileid, enduserID, err);
+                                var instance = msg.FormatMessage(undefined, "Assign SipProfile to EndUser", status, result);
+                                res.write(instance);
+                                res.end();
 
-                        logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d ", profileid, enduserID);
-                        var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
+
+                            }).catch(function(ex){
+
+                                logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d failed", profileid, enduserID);
+                                var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
+                                res.write(instance);
+                                res.end();
+
+
+                            })
+
+                        }
+                        else
+                        {
+                            callback(undefined,undefined, false);
+                        }
+                    }).catch(function(ex){
+
+                        var instance = msg.FormatMessage(ex, "Assign SipProfile to EndUser", status, undefined);
                         res.write(instance);
                         res.end();
 
-                    } else {
 
-                        status = true;
-                        logger.error("DVP-ClusterConfiguration.AssignSipProfiletoEndUser PGSQL SipProfile %d to EndUser %d failed", profileid, enduserID, err);
-                        //redisClient.publish("CSCOMMAND:"+csInstance.Name+":profile", JSON.stringify(id), redis.print);
-                        var instance = msg.FormatMessage(err, "Assign SipProfile to EndUser", status, undefined);
-                        res.write(instance);
-                        res.end();
 
-                    }
+                    });
 
-                });
+
 
             } catch (exp) {
 
@@ -2784,7 +2815,6 @@ function AssignSipProfiletoEndUser(res, profileid, enduserID) {
     });
 
 }
-
 
 function GetIPAddresses(res, req) {
 
