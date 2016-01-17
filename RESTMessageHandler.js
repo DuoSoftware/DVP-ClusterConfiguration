@@ -2217,13 +2217,47 @@ function GetEndUsers(req, res) {
     }).catch(function (err) {
 
 
-        logger.debug("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound", err);
+        logger.error("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound", err);
         var instance = msg.FormatMessage(err, "Get EndUser failed", false, undefined);
         res.write(instance);
         res.end();
 
     });
 }
+
+function GetEndUser(id, req, res) {
+
+
+    logger.debug("DVP-ClusterConfiguration.EndUsers HTTP");
+
+    dbmodel.CloudEndUser.find({where: [{id: id}]}).then(function (enduser) {
+
+
+        logger.debug("DVP-ClusterConfiguration.EndUsers PGSQL EndUsers Found");
+
+
+        try {
+            var instance = msg.FormatMessage(undefined, "Get EndUsers", true, enduser);
+            res.write(instance);
+            res.end();
+        } catch (exp) {
+
+
+        }
+
+
+    }).catch(function (err) {
+
+
+        logger.error("DVP-ClusterConfiguration.EndUserss PGSQL EndUser NotFound", err);
+        var instance = msg.FormatMessage(err, "Get EndUsers failed", false, undefined);
+        res.write(instance);
+        res.end();
+
+    });
+}
+
+
 
 function GetEndUsersByClusterID(req, res, Id) {
 
@@ -2842,12 +2876,6 @@ function GetIPAddresses(res, req) {
 
 
 
-
-
-
-
-
-
 module.exports.CreateCluster = CreateCluster;
 module.exports.AddLoadBalancer = AddLoadBalancer;
 module.exports.GetClusterByID = GetClusterByID;
@@ -2891,4 +2919,4 @@ module.exports.UpdateProfileByID = UpdateProfileByID;
 //Pawan
 module.exports.UpdateEndUser = UpdateEndUser;
 module.exports.DeleteEndUser = DeleteEndUser;
-
+module.exports.GetEndUser = GetEndUser;
