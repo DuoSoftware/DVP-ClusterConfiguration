@@ -923,7 +923,7 @@ function GetCallServerByID(res, Id) {
     logger.debug("DVP-ClusterConfiguration.GetCallServerByID HTTP id %s ", Id);
 
     var idx = parseInt(Id);
-    dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}]}).then(function (csInstance) {
+    dbmodel.CallServer.find({where: [{id: idx}, {Activate: true}], include: [{model : dbmodel.IPAddress, as:"IPAddress"}]}).then(function (csInstance) {
 
 
         try {
