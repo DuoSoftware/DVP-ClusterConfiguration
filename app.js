@@ -263,7 +263,7 @@ server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req
 
 
 server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req, res, next){
-    restMessageHandler.GetEndUser(req.params.id, res, req);
+    restMessageHandler.GetEndUser(req.params.id, req, res);
     return next();
 } );
 
