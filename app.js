@@ -339,6 +339,20 @@ server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res,
     return next();
 } );
 
+
+server.del('/DVP/API/:version/CloudConfiguration/IPAddress/:id',function( req, res, next){
+    restMessageHandler.DeleteIPAddresses(req.params.id, res, req);
+    return next();
+} );
+
+
+
+
+
+
+
+
+
 server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',function( req, res, next){
     restMessageHandler.GetIPAddresses(res, req);
     return next();

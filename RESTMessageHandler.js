@@ -100,7 +100,6 @@ function GetClusters(req, res) {
 
 }
 
-
 function GetActiveCallserversByClusterID(req, res) {
 
 
@@ -143,7 +142,6 @@ function GetActiveCallserversByClusterID(req, res) {
     });
 
 }
-
 
 function EditCluster(Id, req, res, next) {
 
@@ -474,6 +472,50 @@ function StoreIPAddressDetails(res, req) {
     }
 
 
+}
+
+function DeleteIPAddresses(ipId, res, req) {
+
+
+    logger.error("DVP-ClusterConfiguration.DeleteIPAddresses");
+
+    dbmodel.IPAddress.find({where: [{id: ipId}]}).then(function (ipAddresses) {
+
+
+        if(ipAddresses) {
+            ipAddresses.destroy().then(function (obj) {
+
+                var instance = msg.FormatMessage(undefined, "Delete IPAddress succeed", true, obj);
+                res.write(instance);
+                res.end();
+
+
+            }).catch(function (err) {
+
+                logger.error("DVP-ClusterConfiguration.DeleteIPAddresses error");
+                var instance = msg.FormatMessage(err, "IPAddress found", false, undefined);
+                res.write(instance);
+                res.end();
+
+            });
+        }else{
+
+            logger.error("DVP-ClusterConfiguration.DeleteIPAddresses Not found");
+            var instance = msg.FormatMessage(undefined, "IPAddress found", false, undefined);
+            res.write(instance);
+            res.end();
+
+        }
+
+
+    }).catch(function (err) {
+
+        logger.error("DVP-ClusterConfiguration.GetIPAddresses No IPs found");
+        var instance = msg.FormatMessage(err, "Update SipProfile failed, no IPs found", false, undefined);
+        res.write(instance);
+        res.end();
+
+    });
 }
 
 function AddLoadBalancer(res, req) {
@@ -2257,8 +2299,6 @@ function GetEndUser(id, req, res) {
     });
 }
 
-
-
 function GetEndUsersByClusterID(req, res, Id) {
 
     logger.debug("DVP-ClusterConfiguration.GetEndUsersByClusterID HTTP id %d", Id);
@@ -2914,6 +2954,7 @@ module.exports.EditNetwork = EditNetwork;
 module.exports.GetActiveCallserversByClusterID = GetActiveCallserversByClusterID;
 module.exports.GetActiveCallserversByClusterID = GetActiveCallserversByClusterID;
 module.exports.DeleteProfileByID = DeleteProfileByID;
+module.exports.DeleteIPAddresses = DeleteIPAddresses;
 
 module.exports.UpdateProfileByID = UpdateProfileByID;
 //Pawan
