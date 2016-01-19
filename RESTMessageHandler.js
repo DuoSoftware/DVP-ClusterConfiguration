@@ -352,7 +352,7 @@ function StoreIPAddressDetails(res, req) {
 
     logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails HTTP");
 
-    if (IPAddress) {
+    if (IPAddress && IPAddress.IP && validator.isIP(IPAddress.IP)) {
 
         logger.debug("DVP-ClusterConfiguration.StoreIPAddressDetails Model validated ", IPAddress);
 
