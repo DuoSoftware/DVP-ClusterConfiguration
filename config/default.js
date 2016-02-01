@@ -16,8 +16,12 @@ module.exports = {
 
   },
 
+
+
+
   "Host":
   {
+    "resource": "cluster",
     "vdomain": "localhost",
     "domain": "localhost",
     "port": "3636",
