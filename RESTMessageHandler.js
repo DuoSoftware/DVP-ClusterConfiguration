@@ -5,7 +5,7 @@ var config = require('config');
 var redis = require('redis');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-
+var validator = require('validator');
 
 var redisip = config.Redis.ip;
 var redisport = config.Redis.port;
