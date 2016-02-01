@@ -5,6 +5,7 @@ var config = require('config');
 var redis = require('redis');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var jwt = require('restify-jwt');
 var validator = require('validator');
 
 var redisip = config.Redis.ip;
@@ -15,6 +16,15 @@ var redisClient = redis.createClient(redisport, redisip);
 redisClient.on('error', function (err) {
     console.log('Error ' + err);
 });
+
+function GetSecret(iss, callBack){
+
+    redisClient.get("token:iss:"+iss, function(err, reply) {
+
+        callBack(err,reply);
+
+    });
+}
 
 function GetClusterByID(res, Id) {
 
@@ -558,11 +568,11 @@ function AddLoadBalancer(res, req) {
 
                         }).catch(function (err) {
 
-                            logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud failed");
+                            logger.error("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud failed");
 
                             status = false;
 
-                            var instance = msg.FormatMessage(undefined, "Add LoadBalancer", status, undefined);
+                            var instance = msg.FormatMessage(err, "Add LoadBalancer", status, undefined);
                             res.write(instance);
                             res.end();
 
@@ -2961,3 +2971,4 @@ module.exports.UpdateProfileByID = UpdateProfileByID;
 module.exports.UpdateEndUser = UpdateEndUser;
 module.exports.DeleteEndUser = DeleteEndUser;
 module.exports.GetEndUser = GetEndUser;
+module.exports.GetSecret = GetSecret;

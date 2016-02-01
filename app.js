@@ -11,6 +11,9 @@ var config = require('config');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
 var host = config.Host.vdomain || 'localhost';
+var jwt = require('restify-jwt');
+var auth = require('dvp-common/Authentication/auth.js');
+
 
 
 
@@ -99,7 +102,8 @@ server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, next){
+
+server.get('/DVP/API/:version/CloudConfiguration/Clouds',jwt({secret: auth.Autherize}), function( req, res, next){
     restMessageHandler.GetClusters(req, res);
     return next();
 } );
