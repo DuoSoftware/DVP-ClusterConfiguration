@@ -1,11 +1,11 @@
 var dbmodel = require('dvp-dbmodels');
-var profileHandler = require('dvp-common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
-var stringify = require('stringify');
+//var profileHandler = require('dvp-common/SipNetworkProfileApi/SipNetworkProfileBackendHandler.js');
+//var stringify = require('stringify');
 var config = require('config');
 var redis = require('redis');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
-var jwt = require('restify-jwt');
+//var jwt = require('restify-jwt');
 var validator = require('validator');
 
 var redisip = config.Redis.ip;

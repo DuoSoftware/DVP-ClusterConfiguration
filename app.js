@@ -4,7 +4,7 @@
 var restify = require('restify');
 var sre = require('swagger-restify-express');
 var http = require('http');
-var winston = require('winston');
+//var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
 //var format = require('stringformat');
 var config = require('config');
@@ -382,6 +382,7 @@ var basepath = 'http://'+ "localhost"+":"+port;
 
 //var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
 
+/*
 sre.init(server, {
         resourceName : 'CloudConfigurationService',
         server : 'restify', // or express
@@ -392,7 +393,7 @@ sre.init(server, {
             POST : ['path1']
         }
     }
-)
+)*/
 
 server.listen(port, function () {
 
