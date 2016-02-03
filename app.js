@@ -12,7 +12,8 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
 var host = config.Host.vdomain || 'localhost';
 var jwt = require('restify-jwt');
-var auth = require('dvp-common/Authentication/auth.js');
+var secret = require('dvp-common/Authentication/Secret.js');
+var authorization = require('dvp-common/Authentication/Authorization.js');
 
 
 
@@ -71,6 +72,8 @@ restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 
+//server.use(jwt({secret: secret.Secret}));
+
 
 //////////////////////////////Cloud API/////////////////////////////////////////////////////
 
@@ -102,8 +105,8 @@ server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
 } );
 
 
-
-server.get('/DVP/API/:version/CloudConfiguration/Clouds',jwt({secret: auth.Autherize}), function( req, res, next){
+//authorization({resource:"cluster", action:"read"}),
+server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, next){
     restMessageHandler.GetClusters(req, res);
     return next();
 } );

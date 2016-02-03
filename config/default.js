@@ -11,12 +11,17 @@ module.exports = {
 
   "Redis":
   {
-    "ip": "localhost",
+    "ip": "45.55.142.207",
     "port": 6379
 
   },
 
 
+  "Security":
+  {
+    "ip" : "45.55.142.207",
+    "port": 6379
+  },
 
 
   "Host":
