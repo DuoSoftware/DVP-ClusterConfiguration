@@ -11,7 +11,7 @@ var config = require('config');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var port = config.Host.port || 3000;
 var host = config.Host.vdomain || 'localhost';
-var jwt = require('restify-jwt');
+var jwt = require('npm install ');
 var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
 

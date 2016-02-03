@@ -1,0 +1,31 @@
+{
+  "name": "dvp-dbmodels",
+  "version": "1.0.0",
+  "description": "Cluster configuration for duo voice platform deployment",
+  "main": "RESTMessageHandler.js",
+  "dependencies": {
+    "config": "^1.19.0",
+    "dvp-common": "^0.0.14",
+    "dvp-dbmodels": "^0.0.35",
+    "http": "^0.0.0",
+    "redis": "^2.4.2",
+    "restify": "^4.0.3",
+    "restify-jwt": "^0.4.0",
+    "swagger-restify-express": "^0.2.1",
+    "validator": "^4.6.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DuoSoftware/DVP-ClusterConfiguration.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DuoSoftware/DVP-ClusterConfiguration/issues"
+  },
+  "homepage": "https://github.com/DuoSoftware/DVP-ClusterConfiguration#readme"
+}
