@@ -14,4 +14,4 @@ RUN cd /usr/local/src/clusterconfiguration;
 WORKDIR /usr/local/src/clusterconfiguration
 RUN npm install
 EXPOSE 8805
-CMD [ "npm", "/usr/local/src/clusterconfiguration/app.js" ]
+CMD [ "node", "/usr/local/src/clusterconfiguration/app.js" ]
