@@ -2755,7 +2755,7 @@ function AssignSipProfileToCallServer(res, profileid, callserverID) {
 
     logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer HTTP");
 
-    dbmodel.CallServer.find({where: [{id: callserverID}, {Activate: true}]}).complete(function (csInstance) {
+    dbmodel.CallServer.find({where: [{id: callserverID}, {Activate: true}]}).then(function (csInstance) {
 
         if (csInstance) {
 
