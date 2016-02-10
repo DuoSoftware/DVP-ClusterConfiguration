@@ -728,7 +728,7 @@ function CreateCallServer(req, res, next) {
 
         callserver
             .save()
-            .then(function (instance) {
+            .then(function (inst) {
 
                 logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful');
                 status = true;
@@ -736,7 +736,7 @@ function CreateCallServer(req, res, next) {
 
                 try {
 
-                    var instance = msg.FormatMessage(outerror, "Create callserver", status, undefined);
+                    var instance = msg.FormatMessage(outerror, "Create callserver", status, inst);
                     res.write(instance);
                     res.end();
 
@@ -1480,7 +1480,7 @@ function CreateTelcoNetwork(res, req) {
 
         network
             .save()
-            .then(function (instance) {
+            .then(function (inst) {
 
 
                 logger.debug('DVP-ClusterConfiguration.CreateTelcoNetwork PGSQL TelcoNetwork object saved successful');
@@ -1489,7 +1489,7 @@ function CreateTelcoNetwork(res, req) {
 
                 try {
 
-                    var instance = msg.FormatMessage(undefined, "Create Telco Network", status, instance);
+                    var instance = msg.FormatMessage(undefined, "Create Telco Network", status, inst);
                     res.write(instance);
                     res.end();
 
@@ -1573,7 +1573,7 @@ function CreateEndUserNetwork(res, req) {
 
         network
             .save()
-            .then(function (instance) {
+            .then(function (inst) {
 
 
                 logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL UserNetwork object saved successful');
@@ -1582,7 +1582,7 @@ function CreateEndUserNetwork(res, req) {
 
                 try {
 
-                    var instance = msg.FormatMessage(undefined, "Create User Network", status, instance);
+                    var instance = msg.FormatMessage(undefined, "Create User Network", status, inst);
                     res.write(instance);
                     res.end();
 
