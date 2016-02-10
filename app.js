@@ -121,6 +121,13 @@ server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, ne
 server.post('/DVP/API/:version/CloudConfiguration/CallServer', restMessageHandler.CreateCallServer);
 
 
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/UniqueCode', function( req, res, next){
+
+    restMessageHandler.UniqueCode(res,req);
+    return next();
+});
+
+
 server.put('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
     restMessageHandler.EditCallServer(req.params.id,req,res);
     return next();
