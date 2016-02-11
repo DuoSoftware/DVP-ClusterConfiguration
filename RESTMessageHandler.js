@@ -699,12 +699,13 @@ function CreateCallServer(req, res, next) {
     var model = 0;
     var status = false;
     var outerror = undefined;
+    var csData = req.body;
 
-    if (req.body) {
+    if (req.body  && csData.InternalMainIP && validator.isIP(csData.InternalMainIP)) {
 
         logger.debug("DVP-ClusterConfiguration.CreateCallServer Object Validated");
 
-        var csData = req.body;
+
 
         var callserver = dbmodel.CallServer.build({
             Name: csData.Name,
