@@ -77,6 +77,9 @@ function GetClusters(req, res) {
     logger.debug("DVP-ClusterConfiguration.GetClusters HTTP");
 
 
+
+
+
     dbmodel.Cloud.findAll({
         where: [{Activate: true}],
         include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}, {
@@ -1025,8 +1028,9 @@ function GetCallServers(req, res) {
 
         logger.error("DVP-ClusterConfiguration.GetCallServers Failed", err);
 
-        var instance = msg.FormatMessage(err, "Get callservers", false, csInstance);
+        var instance = msg.FormatMessage(err, "Get callservers", false, undefined);
         res.write(instance);
+        res.end();
 
 
     });

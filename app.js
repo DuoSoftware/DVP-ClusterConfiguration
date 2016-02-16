@@ -72,7 +72,7 @@ restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 
-//server.use(jwt({secret: secret.Secret}));
+server.use(jwt({secret: secret.Secret}));
 
 
 //////////////////////////////Cloud API/////////////////////////////////////////////////////
@@ -105,8 +105,8 @@ server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
 } );
 
 
-//authorization({resource:"cluster", action:"read"}),
-server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, next){
+//,
+server.get('/DVP/API/:version/CloudConfiguration/Clouds',authorization({resource:"cluster", action:"read"}), function( req, res, next){
     restMessageHandler.GetClusters(req, res);
     return next();
 } );
