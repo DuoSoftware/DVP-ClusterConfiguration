@@ -4,7 +4,7 @@
 var restify = require('restify');
 var sre = require('swagger-restify-express');
 var http = require('http');
-var winston = require('winston');
+//var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
 //var format = require('stringformat');
 var config = require('config');
@@ -72,7 +72,7 @@ restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 
-//server.use(jwt({secret: secret.Secret}));
+server.use(jwt({secret: secret.Secret}));
 
 
 //////////////////////////////Cloud API/////////////////////////////////////////////////////
@@ -105,8 +105,8 @@ server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res,
 } );
 
 
-//authorization({resource:"cluster", action:"read"}),
-server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, next){
+//,
+server.get('/DVP/API/:version/CloudConfiguration/Clouds',authorization({resource:"cluster", action:"read"}), function( req, res, next){
     restMessageHandler.GetClusters(req, res);
     return next();
 } );
@@ -119,6 +119,13 @@ server.get('/DVP/API/:version/CloudConfiguration/Clouds', function( req, res, ne
 //////////////////////////////CallServer API///////////////////////////////////////////////
 
 server.post('/DVP/API/:version/CloudConfiguration/CallServer', restMessageHandler.CreateCallServer);
+
+
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/UniqueCode', function( req, res, next){
+
+    restMessageHandler.UniqueCode(res,req);
+    return next();
+});
 
 
 server.put('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
@@ -156,6 +163,12 @@ server.del('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudi
     return next();
 } );
 
+server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',function(req, res, next)
+{
+    restMessageHandler.GetCallServersForCompany(req, res);
+    return next();
+} );
+
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -166,6 +179,8 @@ server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:pare
     restMessageHandler.SetParentCloud(res, req.params.childid, req.params.parentid);
     return next();
 } );
+
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -374,6 +389,7 @@ var basepath = 'http://'+ "localhost"+":"+port;
 
 //var basepath = 'http://duosoftware-dvp-clusterconfigu.104.131.90.110.xip.io';
 
+/*
 sre.init(server, {
         resourceName : 'CloudConfigurationService',
         server : 'restify', // or express
@@ -384,7 +400,7 @@ sre.init(server, {
             POST : ['path1']
         }
     }
-)
+)*/
 
 server.listen(port, function () {
 
