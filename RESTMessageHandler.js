@@ -2119,7 +2119,7 @@ function UpdateEndUser(res,req) {
 
 
 
-        dbmodel.CloudEndUser.find({where: [{id: userData.id}]}).then(function (cloudUserObject) {
+        dbmodel.CloudEndUser.find({where: [{id: req.params.id}]}).then(function (cloudUserObject) {
             if (!cloudUserObject) {
 
                 status=false;
