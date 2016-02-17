@@ -18,49 +18,6 @@ var authorization = require('dvp-common/Authentication/Authorization.js');
 
 
 
-
-
-//console.log(process.env);
-
-/*
-var customLevels = {
-    levels: {
-        debug: 0,
-        info: 1,calc
-        warn: 2,
-        error: 3
-    },
-    colors: {
-        debug: 'blue',
-        info: 'green',
-        warn: 'yellow',
-        error: 'red'
-    }
-};
-
-var logger = new(winston.Logger)({
-    level: 'debug',
-    levels: customLevels.levels,
-    transports: [
-        // setup console logging
-        new(winston.transports.Console)({
-            level: 'info', // Only write logs of info level or higher
-            levels: customLevels.levels,
-            colorize: true
-        })
-    ]
-});
-
-
-winston.addColors(customLevels.colors);
-
-
-//logger.info('Hello distributed log files!');
-//logger.error('Hello distributed log files!');
-//logger.warn('Hello distributed log files!');
-//restHandler.CreateDB();
-*/
-
 var server = restify.createServer({
     name: "DVP Cluster Service"
 });
@@ -77,29 +34,33 @@ server.use(jwt({secret: secret.Secret}));
 
 //////////////////////////////Cloud API/////////////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/Cloud', restMessageHandler.CreateCluster);
+server.post('/DVP/API/:version/CloudConfiguration/Cloud',authorization({resource:"cluster", action:"write"}), function(req, res, next) {
 
-server.post('/DVP/API/:version/CloudConfiguration/Cloud/:id/Activate/:status', function( req, res, next){
+        restMessageHandler.CreateCluster(req, res);
+        return next();
+    });
 
-    restMessageHandler.ActivateCloud(res,req.params.id,req.params.status);
+server.post('/DVP/API/:version/CloudConfiguration/Cloud/:id/Activate/:status',authorization({resource:"cluster", action:"write"}), function( req, res, next){
+
+    restMessageHandler.ActivateCloud(req, res,req.params.id,req.params.status);
     return next();
 });
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res, next){
-    restMessageHandler.GetClusterByID(res, req.params.id);
+server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id',authorization({resource:"cluster", action:"read"}), function( req, res, next){
+    restMessageHandler.GetClusterByID(req,res, req.params.id);
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id/ActiveCallservers', function( req, res, next){
-    restMessageHandler.GetActiveCallserversByClusterID(res, req.params.id);
+server.get('/DVP/API/:version/CloudConfiguration/Cloud/:id/ActiveCallservers',authorization({resource:"cluster", action:"read"}), function( req, res, next){
+    restMessageHandler.GetActiveCallserversByClusterID(req, res);
     return next();
 } );
 
 
 
 
-server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id', function( req, res, next){
+server.put('/DVP/API/:version/CloudConfiguration/Cloud/:id',authorization({resource:"cluster", action:"write"}), function( req, res, next){
     restMessageHandler.EditCluster(req.params.id,req,res);
     return next();
 } );
@@ -118,52 +79,56 @@ server.get('/DVP/API/:version/CloudConfiguration/Clouds',authorization({resource
 
 //////////////////////////////CallServer API///////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/CallServer', restMessageHandler.CreateCallServer);
+server.post('/DVP/API/:version/CloudConfiguration/CallServer',authorization({resource:"callserver", action:"write"}), function( req, res, next){
+
+        restMessageHandler.CreateCallServer(res,req);
+        return next();
+    });
 
 
-server.post('/DVP/API/:version/CloudConfiguration/CallServer/UniqueCode', function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/UniqueCode',authorization({resource:"callserver", action:"write"}), function( req, res, next){
 
     restMessageHandler.UniqueCode(res,req);
     return next();
 });
 
 
-server.put('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
+server.put('/DVP/API/:version/CloudConfiguration/CallServer/:id',authorization({resource:"callserver", action:"write"}), function( req, res, next){
     restMessageHandler.EditCallServer(req.params.id,req,res);
     return next();
 } );
 
 
-server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/Activate/:status', function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/Activate/:status',authorization({resource:"callserver", action:"write"}), function( req, res, next){
 
-    restMessageHandler.ActivateCallServer(res,req.params.id,req.params.status);
+    restMessageHandler.ActivateCallServer(req, res, req.params.id, req.params.status);
     return next();
 });
 
 
-server.get('/DVP/API/:version/CloudConfiguration/CallServer/:id', function( req, res, next){
-    restMessageHandler.GetCallServerByID(res, req.params.id);
+server.get('/DVP/API/:version/CloudConfiguration/CallServer/:id',authorization({resource:"callserver", action:"read"}), function( req, res, next){
+    restMessageHandler.GetCallServerByID(req, res, req.params.id);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/CallServers', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CallServers',authorization({resource:"callserver", action:"read"}), function( req, res, next){
     restMessageHandler.GetCallServers(req,res);
     return next();
 } );
 
-server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudid',function( req, res, next){
-    restMessageHandler.AddCallServerToCloud(res, req.params.id,req.params.cloudid);
+server.post('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudid',authorization({resource:"callserver", action:"write"}),function( req, res, next){
+    restMessageHandler.AddCallServerToCloud(req, res, req.params.id,req.params.cloudid);
     return next();
 } );
 
 
-server.del('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudid',function( req, res, next){
-    restMessageHandler.RemoveCallServerFromCloud(res, req.params.id,req.params.cloudid);
+server.del('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudid',authorization({resource:"callserver", action:"delete"}),function( req, res, next){
+    restMessageHandler.RemoveCallServerFromCloud(req, res, req.params.id,req.params.cloudid);
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',function(req, res, next)
+server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',authorization({resource:"callserver", action:"get"}),function(req, res, next)
 {
     restMessageHandler.GetCallServersForCompany(req, res);
     return next();
@@ -175,8 +140,8 @@ server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',function
 /////////////////////////////////Virtual cluster API///////////////////////////////////////
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:parentid',function( req, res, next){
-    restMessageHandler.SetParentCloud(res, req.params.childid, req.params.parentid);
+server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:parentid',authorization({resource:"cluster", action:"write"}),function( req, res, next){
+    restMessageHandler.SetParentCloud(req, res, req.params.childid, req.params.parentid);
     return next();
 } );
 
@@ -187,7 +152,7 @@ server.post('/DVP/API/:version/CloudConfiguration/Cloud/:childid/SetParent/:pare
 
 ///////////////////////////////LoadBalancer API////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/LoadBalancer',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/LoadBalancer',authorization({resource:"cluster", action:"write"}),function( req, res, next){
     restMessageHandler.AddLoadBalancer(res, req);
     return next();
 } );
@@ -198,68 +163,68 @@ server.post('/DVP/API/:version/CloudConfiguration/LoadBalancer',function( req, r
 /////////////////////////////Network API//////////////////////////////////////////////////////
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Network/TelcoNetwork',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/Network/TelcoNetwork',authorization({resource:"network", action:"write"}),function( req, res, next){
     restMessageHandler.CreateTelcoNetwork(res, req);
     return next();
 } );
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Network/UserNetwork',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/Network/UserNetwork',authorization({resource:"network", action:"write"}),function( req, res, next){
     restMessageHandler.CreateEndUserNetwork(res, req);
     return next();
 } );
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToCloud/:cloudid',function( req, res, next){
-    restMessageHandler.SetTelcoNetworkToCloud(res,req.params.networkid,req.params.cloudid);
+server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToCloud/:cloudid',authorization({resource:"network", action:"write"}),function( req, res, next){
+    restMessageHandler.SetTelcoNetworkToCloud(req,res,req.params.networkid,req.params.cloudid);
     return next();
 } );
 
 
-server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToCloud/:cloudid',function( req, res, next){
-    restMessageHandler.RemoveTelcoNetworkFromCloud(res,req.params.networkid,req.params.cloudid);
+server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToCloud/:cloudid',authorization({resource:"network", action:"delete"}),function( req, res, next){
+    restMessageHandler.RemoveTelcoNetworkFromCloud(req,res,req.params.networkid,req.params.cloudid);
     return next();
 } );
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',function( req, res, next){
-    restMessageHandler.SetTelcoNetworkToUSer(res,req.params.networkid,req.params.userid);
+server.post('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',authorization({resource:"network", action:"write"}),function( req, res, next){
+    restMessageHandler.SetTelcoNetworkToUSer(req,res,req.params.networkid,req.params.userid);
     return next();
 } );
 
 
-server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',function( req, res, next){
-    restMessageHandler.RemoveTelcoNetworkFromUser(res,req.params.networkid,req.params.userid);
+server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetworkToUser/:userid',authorization({resource:"network", action:"delete"}),function( req, res, next){
+    restMessageHandler.RemoveTelcoNetworkFromUser(req,res,req.params.networkid,req.params.userid);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Networks', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Networks',authorization({resource:"network", action:"get"}), function( req, res, next){
     restMessageHandler.GetNetworks(req,res);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Network/:id', authorization({resource:"network", action:"get"}),function( req, res, next){
     restMessageHandler.GetNetwork(req.params.id,req,res);
     return next();
 } );
 
 
-server.put('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
+server.put('/DVP/API/:version/CloudConfiguration/Network/:id', authorization({resource:"network", action:"write"}),function( req, res, next){
     restMessageHandler.EditNetwork(req.params.id,req,res);
     return next();
 } );
 
 
-server.del('/DVP/API/:version/CloudConfiguration/Network/:id', function( req, res, next){
+server.del('/DVP/API/:version/CloudConfiguration/Network/:id', authorization({resource:"network", action:"delete"}),function( req, res, next){
     restMessageHandler.DeleteNetwork(req.params.id,req,res);
     return next();
 } );
 
 
 
-server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', authorization({resource:"network", action:"get"}),function( req, res, next){
     restMessageHandler.GetNetworkByClusterID(req, res, req.params.id);
     return next();
 } );
@@ -272,36 +237,36 @@ server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', funct
 
 ////////////////////////////////////User ////////////////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',authorization({resource:"enduser", action:"write"}),function( req, res, next){
     restMessageHandler.CreateEndUser(res, req);
     return next();
 } );
 
 // Pawan
-server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req, res, next){
+server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"write"}),function( req, res, next){
     restMessageHandler.UpdateEndUser(res, req);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"get"}),function( req, res, next){
     restMessageHandler.GetEndUser(req.params.id, req, res);
     return next();
 } );
 
 // Pawan
-server.del('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',function( req, res, next){
-    restMessageHandler.DeleteEndUser(res, req.params.id);
+server.del('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"delete"}),function( req, res, next){
+    restMessageHandler.DeleteEndUser(req, res, req.params.id);
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', authorization({resource:"enduser", action:"get"}),function( req, res, next){
     restMessageHandler.GetEndUsers(req, res);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', authorization({resource:"enduser", action:"get"}),function( req, res, next){
     restMessageHandler.GetEndUsersByClusterID(req, res,req.params.id);
     return next();
 } );
@@ -313,41 +278,41 @@ server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', f
 
 ////////////////////////////profile////////////////////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/Profile',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/Profile',authorization({resource:"profile", action:"write"}),function( req, res, next){
     restMessageHandler.CreateSipProfile(res, req);
     return next();
 } );
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToCallServer/:callserverid',function( req, res, next){
-    restMessageHandler.AssignSipProfileToCallServer(res,req.params.profileid,req.params.callserverid);
+server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToCallServer/:callserverid',authorization({resource:"profile", action:"write"}),function( req, res, next){
+    restMessageHandler.AssignSipProfileToCallServer(req,res,req.params.profileid,req.params.callserverid);
     return next();
 } );
 
 
 
-server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToEndUser/:enduser',function( req, res, next){
-    restMessageHandler.AssignSipProfiletoEndUser(res,req.params.profileid,req.params.enduser);
+server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileToEndUser/:enduser',authorization({resource:"profile", action:"write"}),function( req, res, next){
+    restMessageHandler.AssignSipProfiletoEndUser(req, res,req.params.profileid,req.params.enduser);
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
-    restMessageHandler.GetProfileByID(res, req.params.id);
+server.get('/DVP/API/:version/CloudConfiguration/Profile/:id',authorization({resource:"profile", action:"get"}), function( req, res, next){
+    restMessageHandler.GetProfileByID(req, res, req.params.id);
     return next();
 } );
 
-server.del('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
+server.del('/DVP/API/:version/CloudConfiguration/Profile/:id', authorization({resource:"profile", action:"delete"}),function( req, res, next){
     restMessageHandler.DeleteProfileByID(req.params.id,req,res);
     return next();
 } );
 
-server.put('/DVP/API/:version/CloudConfiguration/Profile/:id', function( req, res, next){
+server.put('/DVP/API/:version/CloudConfiguration/Profile/:id', authorization({resource:"profile", action:"write"}),function( req, res, next){
     restMessageHandler.UpdateProfileByID(req.params.id,req,res);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Profiles', function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Profiles', authorization({resource:"profile", action:"get"}),function( req, res, next){
     restMessageHandler.GetProfiles(req,res);
     return next();
 } );
@@ -356,26 +321,19 @@ server.get('/DVP/API/:version/CloudConfiguration/Profiles', function( req, res, 
 
 ///////////////////////////////////////////StoreIPAddressDetails/////////////////////////////////////////////////////////
 
-server.post('/DVP/API/:version/CloudConfiguration/IPAddress',function( req, res, next){
+server.post('/DVP/API/:version/CloudConfiguration/IPAddress',authorization({resource:"profile", action:"write"}),function( req, res, next){
     restMessageHandler.StoreIPAddressDetails(res, req);
     return next();
 } );
 
 
-server.del('/DVP/API/:version/CloudConfiguration/IPAddress/:id',function( req, res, next){
+server.del('/DVP/API/:version/CloudConfiguration/IPAddress/:id',authorization({resource:"profile", action:"delete"}),function( req, res, next){
     restMessageHandler.DeleteIPAddresses(req.params.id, res, req);
     return next();
 } );
 
 
-
-
-
-
-
-
-
-server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',authorization({resource:"profile", action:"get"}),function( req, res, next){
     restMessageHandler.GetIPAddresses(res, req);
     return next();
 } );
