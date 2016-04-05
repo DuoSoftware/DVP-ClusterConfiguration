@@ -271,6 +271,21 @@ server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', a
     return next();
 } );
 
+server.post('/DVP/API/:version/CloudConfiguration/BlacklistNumber', authorization({resource:"enduser", action:"write"}),function( req, res, next){
+    restMessageHandler.AddNumberToBlacklist(req, res);
+    return next();
+} );
+
+server.del('/DVP/API/:version/CloudConfiguration/BlacklistNumber/:id', authorization({resource:"enduser", action:"delete"}),function( req, res, next){
+    restMessageHandler.RemoveNumberFromBlacklist(req, res);
+    return next();
+} );
+
+server.get('/DVP/API/:version/CloudConfiguration/BlacklistNumbers', authorization({resource:"enduser", action:"read"}),function( req, res, next){
+    restMessageHandler.GetNumbersInBlacklist(req, res);
+    return next();
+} );
+
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

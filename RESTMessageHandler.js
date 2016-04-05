@@ -3981,6 +3981,159 @@ function GetCallServersForCompany(req, res) {
 
 }
 
+function AddNumberToBlacklist(req, res)
+{
+    try
+    {
+        var reqBody = req.body;
+
+        logger.debug('[DVP-ClusterConfiguration.AddNumberToBlacklist] - HTTP Request Received - Req Body : ', reqBody);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        if(reqBody)
+        {
+            var blacklist = dbmodel.NumberBlacklist.build({PhoneNumber: reqBody.PhoneNumber, CompanyId: companyId, TenantId: tenantId});
+
+            blacklist
+                .save()
+                .then(function (saveRes)
+                {
+                    var jsonString = msg.FormatMessage(undefined, "Add number to blacklist success", true, true);
+                    logger.debug('[DVP-ClusterConfiguration.AddNumberToBlacklist] - API RESPONSE : %s', jsonString);
+                    res.end(jsonString);
+
+                }).catch(function(err)
+                {
+                    var jsonString = msg.FormatMessage(err, "Add number to blacklist failed", false, false);
+                    logger.debug('[DVP-ClusterConfiguration.AddNumberToBlacklist] - API RESPONSE : %s', jsonString);
+                    res.end(jsonString);
+                });
+        }
+        else
+        {
+            var jsonString = msg.FormatMessage(new Error('Empty request body'), "Empty request body", false, false);
+            logger.debug('[DVP-ClusterConfiguration.AddNumberToBlacklist] - API RESPONSE : %s', jsonString);
+            res.end(jsonString);
+
+        }
+
+
+    }
+    catch(ex)
+    {
+        logger.error('[DVP-ClusterConfiguration.AddNumberToBlacklist] - Exception Occurred', ex);
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-ClusterConfiguration.AddNumberToBlacklist] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+
+    }
+
+}
+
+function RemoveNumberFromBlacklist(req, res)
+{
+    try
+    {
+        var numId = req.params.id;
+
+        logger.debug('[DVP-ClusterConfiguration.RemoveNumberFromBlacklist] - HTTP Request Received - Req Params Id : ', numId);
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        dbmodel.NumberBlacklist.find({where: [{id: numId},{CompanyId: companyId},{TenantId: tenantId}]}).then(function (blackListNum)
+        {
+            if(blackListNum)
+            {
+                blackListNum.destroy().then(function (result)
+                {
+                    var jsonString = msg.FormatMessage(undefined, "Remove number from blacklist success", true, true);
+                    logger.debug('[DVP-ClusterConfiguration.RemoveNumberFromBlacklist] - API RESPONSE : %s', jsonString);
+                    res.end(jsonString);
+
+                }).catch(function(err)
+                {
+                    var jsonString = msg.FormatMessage(err, "Remove number from blacklist failed", false, false);
+                    logger.debug('[DVP-ClusterConfiguration.RemoveNumberFromBlacklist] - API RESPONSE : %s', jsonString);
+                    res.end(jsonString);
+                });
+            }
+            else
+            {
+
+                var jsonString = msg.FormatMessage(new Error('Cannot find a number with given id'), "Remove number from blacklist failed", false, false);
+                logger.error('[DVP-ClusterConfiguration.RemoveNumberFromBlacklist] - Cannot find a number with given id');
+                res.end(jsonString);
+            }
+
+
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-ClusterConfiguration.RemoveNumberFromBlacklist] - Error occurred', err);
+            var jsonString = msg.FormatMessage(err, "Remove number from blacklist failed", false, false);
+            res.end(jsonString);
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-ClusterConfiguration.RemoveNumberFromBlacklist] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
+function GetNumbersInBlacklist(req, res)
+{
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.GetNumbersInBlacklist] - HTTP Request Received');
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        dbmodel.NumberBlacklist.findAll({where: [{CompanyId: companyId},{TenantId: tenantId}]}).then(function (blackListNumList)
+        {
+            var jsonString = msg.FormatMessage(undefined, "Get numbers from blacklist success", true, blackListNumList);
+            logger.debug('[DVP-ClusterConfiguration.GetNumbersInBlacklist] - API RESPONSE : %s', jsonString);
+            res.end(jsonString);
+
+        }).catch(function(err)
+        {
+            logger.error('[DVP-ClusterConfiguration.GetNumbersInBlacklist] - Error occurred', err);
+            var jsonString = msg.FormatMessage(err, "Get numbers from blacklist failed", false, false);
+            res.end(jsonString);
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, false);
+        logger.debug('[DVP-ClusterConfiguration.GetNumbersInBlacklist] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
 
 
 module.exports.CreateCluster = CreateCluster;
@@ -4030,3 +4183,6 @@ module.exports.GetEndUser = GetEndUser;
 module.exports.GetNetworkByClusterID = GetNetworkByClusterID;
 module.exports.GetEndUsersByClusterID = GetEndUsersByClusterID;
 module.exports.GetCallServersForCompany = GetCallServersForCompany;
+module.exports.AddNumberToBlacklist = AddNumberToBlacklist;
+module.exports.RemoveNumberFromBlacklist = RemoveNumberFromBlacklist;
+module.exports.GetNumbersInBlacklist = GetNumbersInBlacklist;
