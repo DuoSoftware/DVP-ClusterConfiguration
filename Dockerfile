@@ -8,7 +8,7 @@
 #EXPOSE 8805
 
 
-FROM node:argon
+FROM node:5.10.0
 RUN git clone git://github.com/DuoSoftware/DVP-ClusterConfiguration.git /usr/local/src/clusterconfiguration
 RUN cd /usr/local/src/clusterconfiguration;
 WORKDIR /usr/local/src/clusterconfiguration
