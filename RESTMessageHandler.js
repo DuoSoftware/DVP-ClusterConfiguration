@@ -3825,7 +3825,7 @@ function GetCallServersForCompany(req, res) {
                                 {
                                     //find call server
                                     dbmodel.CallServer
-                                        .find({where: [{CompanyId: companyId}, {TenantId: tenantId}]})
+                                        .find({where: [{CompanyId: company}, {TenantId: tenant}]})
                                         .then(function (cs) {
                                             if (cs) {
                                                 logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get call server query success');
@@ -3858,7 +3858,7 @@ function GetCallServersForCompany(req, res) {
                                     //find call server that matches profile
                                     dbmodel.SipNetworkProfile
                                         .find({
-                                            where: [{CompanyId: companyId}, {TenantId: tenantId}, {ObjType: "INTERNAL"}],
+                                            where: [{CompanyId: company}, {TenantId: tenant}, {ObjType: "INTERNAL"}],
                                             include: [{model: dbmodel.CallServer, as: "CallServer"}]
                                         })
                                         .then(function (res) {
