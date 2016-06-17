@@ -128,7 +128,7 @@ server.del('/DVP/API/:version/CloudConfiguration/CallServer/:id/AssignTo/:cloudi
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',authorization({resource:"callserver", action:"get"}),function(req, res, next)
+server.get('/DVP/API/:version/CloudConfiguration/CallserversByCompany/',authorization({resource:"callserver", action:"read"}),function(req, res, next)
 {
     restMessageHandler.GetCallServersForCompany(req, res);
     return next();
@@ -199,13 +199,13 @@ server.del('/DVP/API/:version/CloudConfiguration/Network/:networkid/SetTelcoNetw
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Networks',authorization({resource:"network", action:"get"}), function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Networks',authorization({resource:"network", action:"read"}), function( req, res, next){
     restMessageHandler.GetNetworks(req,res);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Network/:id', authorization({resource:"network", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Network/:id', authorization({resource:"network", action:"read"}),function( req, res, next){
     restMessageHandler.GetNetwork(req.params.id,req,res);
     return next();
 } );
@@ -224,7 +224,7 @@ server.del('/DVP/API/:version/CloudConfiguration/Network/:id', authorization({re
 
 
 
-server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', authorization({resource:"network", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', authorization({resource:"network", action:"read"}),function( req, res, next){
     restMessageHandler.GetNetworkByClusterID(req, res, req.params.id);
     return next();
 } );
@@ -249,7 +249,7 @@ server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"read"}),function( req, res, next){
     restMessageHandler.GetEndUser(req.params.id, req, res);
     return next();
 } );
@@ -260,13 +260,13 @@ server.del('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', authorization({resource:"enduser", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', authorization({resource:"enduser", action:"read"}),function( req, res, next){
     restMessageHandler.GetEndUsers(req, res);
     return next();
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', authorization({resource:"enduser", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', authorization({resource:"enduser", action:"read"}),function( req, res, next){
     restMessageHandler.GetEndUsersByClusterID(req, res,req.params.id);
     return next();
 } );
@@ -311,7 +311,7 @@ server.post('/DVP/API/:version/CloudConfiguration/Profile/:profileid/SetProfileT
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/Profile/:id',authorization({resource:"profile", action:"get"}), function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Profile/:id',authorization({resource:"profile", action:"read"}), function( req, res, next){
     restMessageHandler.GetProfileByID(req, res, req.params.id);
     return next();
 } );
@@ -327,7 +327,7 @@ server.put('/DVP/API/:version/CloudConfiguration/Profile/:id', authorization({re
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/Profiles', authorization({resource:"profile", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/Profiles', authorization({resource:"profile", action:"read"}),function( req, res, next){
     restMessageHandler.GetProfiles(req,res);
     return next();
 } );
@@ -348,7 +348,7 @@ server.del('/DVP/API/:version/CloudConfiguration/IPAddress/:id',authorization({r
 } );
 
 
-server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',authorization({resource:"profile", action:"get"}),function( req, res, next){
+server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',authorization({resource:"profile", action:"read"}),function( req, res, next){
     restMessageHandler.GetIPAddresses(res, req);
     return next();
 } );
