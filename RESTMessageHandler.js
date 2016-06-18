@@ -2652,8 +2652,6 @@ function CreateEndUser(res, req) {
 
                                 logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
 
-
-                                if (!errx)
                                     status = true;
 
                             }).catch(function (err) {
@@ -2693,7 +2691,7 @@ function CreateEndUser(res, req) {
                 else {
 
                     logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID);
-                    var instance = msg.FormatMessage(err, "Create EndUser failed", status, undefined);
+                    var instance = msg.FormatMessage(new Error('Create EndUser failed'), "Create EndUser failed", status, undefined);
                     res.write(instance);
                     res.end();
 
@@ -2721,7 +2719,7 @@ function CreateEndUser(res, req) {
 
     }else{
 
-        res.write(msg.FormatMessage(err, "Token error, no company data found", false, undefined));
+        res.write(msg.FormatMessage(new Error('Token error, no company data found'), "Token error, no company data found", false, undefined));
         res.end();
 
     }
