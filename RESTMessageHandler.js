@@ -2632,8 +2632,8 @@ function CreateEndUser(res, req) {
 
                     var user = dbmodel.CloudEndUser.build({
                         Domain: userData.Domain,
-                        CompanyId: company,
-                        TenantId: tenant,
+                        CompanyId: userData.ClientCompany,
+                        TenantId: userData.ClientTenant,
                         SIPConnectivityProvision: provision
 
                     });
