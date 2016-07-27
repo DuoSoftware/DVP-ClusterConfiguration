@@ -5,13 +5,35 @@ var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
 //var jwt = require('restify-jwt');
 var validator = require('validator');
+var redisHandler = require('./RedisHandler.js');
 var redisip = config.Redis.ip;
 var redisport = config.Redis.port;
 var redisClient = redis.createClient(redisport, redisip);
 
+
 redisClient.on('error', function (err) {
     console.log('Error ' + err);
 });
+
+var redisCallback = function(err, resp)
+{
+
+};
+
+var addClusterToCache = function(clusterId)
+{
+    dbmodel.Cloud.find({where:[{id: clusterId}], include:[{model: dbmodel.LoadBalancer, as: "LoadBalancer"}]})
+        .then(function (cloudRec)
+        {
+            if(cloudRec)
+            {
+                redisHandler.SetObject('CLOUD:' + clusterId, cloudRec, redisCallback);
+            }
+
+        });
+
+};
+
 
 function GetClusterByID(req, res, Id) {
 
@@ -259,7 +281,12 @@ function EditCluster(Id, req, res) {
                         Type: cloudData.Type,
                         Category: cloudData.Category
 
-                    }).then(function (inst) {
+                    }).then(function (inst)
+                    {
+                        if(inst)
+                        {
+                            addClusterToCache(inst.id);
+                        }
 
 
                         logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful');
@@ -387,6 +414,11 @@ function CreateCluster(req, res) {
             cloud
                 .save()
                 .then(function (inst) {
+
+                    if(inst)
+                    {
+                        addClusterToCache(inst.id);
+                    }
 
 
                     logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL Cloud object saved successful');
@@ -703,6 +735,11 @@ function AddLoadBalancer(res, req) {
 
                             cloudObject.setLoadBalancer(loadBalancerObject).then(function (cloudInstancex) {
 
+                                if(cloudObject)
+                                {
+                                    addClusterToCache(cloudObject.id);
+                                }
+
                                 logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud");
 
                                 status = true;
@@ -807,6 +844,11 @@ function ActivateCloud(req,res, id, activate) {
 
                 }).then(function (instance) {
 
+                    if(instance)
+                    {
+                        addClusterToCache(instance.id);
+                    }
+
 
                     status = true;
                     logger.error("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Activate Successful");
@@ -910,7 +952,14 @@ function CreateCallServer(res,req) {
 
             callserver
                 .save()
-                .then(function (inst) {
+                .then(function (inst)
+                {
+
+                    if(inst)
+                    {
+                        redisHandler.SetObject('CALLSERVER:' + inst.id, JSON.stringify(inst), redisCallback);
+                        redisHandler.checkAndSetCallServerToCompanyObj(inst, tenant, company);
+                    }
 
                     logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful');
                     status = true;
@@ -1050,6 +1099,12 @@ function EditCallServer(Id, req, res) {
 
                     }).then(function (instance) {
 
+                        if(instance)
+                        {
+                            redisHandler.SetObject('CALLSERVER:' + instance.id, JSON.stringify(instance), redisCallback);
+                            redisHandler.checkAndSetCallServerToCompanyObj(instance, tenant, company);
+                        }
+
                         logger.debug('DVP-ClusterConfiguration.EditCallServer PGSQL CallServer object updated successful');
                         status = true;
 
@@ -1152,6 +1207,12 @@ function ActivateCallServer(req, res, id, activate) {
                     Activate: activeStatus
 
                 }).then(function (instance) {
+
+                    if(instance)
+                    {
+                        redisHandler.SetObject('CALLSERVER:' + instance.id, JSON.stringify(instance), redisCallback);
+                        redisHandler.checkAndSetCallServerToCompanyObj(instance, tenant, company);
+                    }
 
                     status = true;
                     logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer Activated");
@@ -1342,16 +1403,24 @@ function RemoveCallServerFromCloud(req, res, Id, cloudID) {
 
 
 
-        dbmodel.Cloud.find({
-            where: [{id: parseInt(cloudID)}, {Activate: true}, {CompanyId: company}, {TenantId: tenant}],
-            include: [{model: dbmodel.CallServer, as: "CallServer", where: [{id: parseInt(Id)}]}]
-        }).then(function (cloudInstance) {
+        dbmodel.CallServer.find({
+            where: [{id: parseInt(Id)}, {CompanyId: company}, {TenantId: tenant}]
+        }).then(function (csInstance) {
 
-            if (cloudInstance) {
+            if (csInstance) {
 
                 logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL Cloud %s Found", cloudID);
 
-                cloudInstance.removeCallServer(cloudInstance.CallServer).then(function (cloudInstancex) {
+
+                csInstance.updateAttributes({
+                        ClusterId: null
+                }).then(function (instance)
+                {
+                    if(instance)
+                    {
+                        redisHandler.SetObject('CALLSERVER:' + instance.id, JSON.stringify(instance), redisCallback);
+                        redisHandler.checkAndSetCallServerToCompanyObj(instance, tenant, company);
+                    }
 
                     logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL");
 
@@ -1360,15 +1429,17 @@ function RemoveCallServerFromCloud(req, res, Id, cloudID) {
                     res.write(instance);
                     res.end();
 
-                }).catch(function (err) {
+                }).catch(function(ex)
+                {
 
                     status = false;
                     var instance = msg.FormatMessage(err, "RemoveCallservers to cloud", status, undefined);
                     res.write(instance);
                     res.end();
 
-
                 });
+
+
 
             } else {
 
@@ -1438,7 +1509,13 @@ function AddCallServerToCloud(req, res, Id, cloudID) {
 
                         logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL Cloud %s Found", cloudID);
 
-                        cloudInstance.addCallServer(csInstance).then(function (cloudInstancex) {
+                        cloudInstance.addCallServer(csInstance).then(function (instance) {
+
+                            if(instance)
+                            {
+                                redisHandler.SetObject('CALLSERVER:' + instance.id, JSON.stringify(instance), redisCallback);
+                                redisHandler.checkAndSetCallServerToCompanyObj(instance, tenant, company);
+                            }
 
                             logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL");
 
@@ -1540,6 +1617,12 @@ function SetParentCloud(req,res, chilid, parentid) {
 
 
                         childInstance.setParentCloud(parentInstance).then(function (cloudInstancex) {
+
+                            if(childInstance)
+                            {
+                                addClusterToCache(childInstance.id);
+                            }
+
 
                             logger.debug("DVP-ClusterConfiguration.SetParentCloud PGSQL");
 
