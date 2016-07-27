@@ -20,20 +20,6 @@ var redisCallback = function(err, resp)
 
 };
 
-var addClusterToCache = function(clusterId)
-{
-    dbmodel.Cloud.find({where:[{id: clusterId}], include:[{model: dbmodel.LoadBalancer, as: "LoadBalancer"}]})
-        .then(function (cloudRec)
-        {
-            if(cloudRec)
-            {
-                redisHandler.SetObject('CLOUD:' + clusterId, cloudRec, redisCallback);
-            }
-
-        });
-
-};
-
 
 function GetClusterByID(req, res, Id) {
 
@@ -285,7 +271,7 @@ function EditCluster(Id, req, res) {
                     {
                         if(inst)
                         {
-                            addClusterToCache(inst.id);
+                            redisHandler.addClusterToCache(inst.id);
                         }
 
 
@@ -417,7 +403,7 @@ function CreateCluster(req, res) {
 
                     if(inst)
                     {
-                        addClusterToCache(inst.id);
+                        redisHandler.addClusterToCache(inst.id);
                     }
 
 
@@ -737,7 +723,7 @@ function AddLoadBalancer(res, req) {
 
                                 if(cloudObject)
                                 {
-                                    addClusterToCache(cloudObject.id);
+                                    redisHandler.addClusterToCache(cloudObject.id);
                                 }
 
                                 logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud");
@@ -846,7 +832,7 @@ function ActivateCloud(req,res, id, activate) {
 
                     if(instance)
                     {
-                        addClusterToCache(instance.id);
+                        redisHandler.addClusterToCache(instance.id);
                     }
 
 
@@ -1620,7 +1606,7 @@ function SetParentCloud(req,res, chilid, parentid) {
 
                             if(childInstance)
                             {
-                                addClusterToCache(childInstance.id);
+                                redisHandler.addClusterToCache(childInstance.id);
                             }
 
 

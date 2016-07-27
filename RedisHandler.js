@@ -2,6 +2,7 @@ var redis = require("redis");
 var Config = require('config');
 var Redlock = require('redlock');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var dbmodel = require('dvp-dbmodels');
 
 var redisIp = Config.Redis.ip;
 var redisPort = Config.Redis.port;
@@ -26,15 +27,63 @@ var redlock = new Redlock(
     }
 );
 
+var redisCallback = function(err, resp)
+{
+
+};
+
 redlock.on('clientError', function(err)
 {
     logger.error('[DVP-ClusterConfiguration.AcquireLock] - [%s] - REDIS LOCK FAILED', err);
 
 });
 
+var addClusterToCache = function(clusterId)
+{
+    var ttl = 2000;
+    var lockKey = 'CLOUDLOCK:' + clusterId;
+
+    redlock.lock(lockKey, ttl).then(function(lock)
+    {
+
+        dbmodel.Cloud.find({where: [{id: clusterId}], include: [{model: dbmodel.LoadBalancer, as: "LoadBalancer"}]})
+            .then(function (cloudRec)
+            {
+                if (cloudRec)
+                {
+                    client.set('CLOUD:' + clusterId, JSON.stringify(cloudRec), function(err, setResp)
+                    {
+                        lock.unlock()
+                            .catch(function(err) {
+                                logger.error('[DVP-ClusterConfiguration.checkAndSetCallServerToCompanyObj] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                            });
+                    });
+                }
+                else
+                {
+                    lock.unlock()
+                        .catch(function(err) {
+                            logger.error('[DVP-ClusterConfiguration.checkAndSetCallServerToCompanyObj] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                        });
+                }
+
+            }).catch(function(err)
+            {
+                lock.unlock()
+                    .catch(function(err) {
+                        logger.error('[DVP-ClusterConfiguration.checkAndSetCallServerToCompanyObj] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                    });
+            });
+    }).catch(function(err)
+    {
+        logger.error('[DVP-ClusterConfiguration.addClusterToCache] - [%s] - REDIS LOCK ACQUIRE FAILED', err);
+    });
+
+};
+
 var checkAndSetCallServerToCompanyObj = function(newCsObj, tenantId, companyId)
 {
-    var ttl = 1000;
+    var ttl = 2000;
 
     var lockKey = 'DVPCACHELOCK:' + tenantId + ':' + companyId;
 
@@ -78,7 +127,7 @@ var checkAndSetCallServerToCompanyObj = function(newCsObj, tenantId, companyId)
 
     }).catch(function(err)
     {
-        logger.error('[DVP-ClusterConfiguration.AcquireLock] - [%s] - REDIS LOCK ACQUIRE FAILED', err);
+        logger.error('[DVP-ClusterConfiguration.checkAndSetCallServerToCompanyObj] - [%s] - REDIS LOCK ACQUIRE FAILED', err);
     });
 };
 
@@ -124,3 +173,4 @@ var DeleteObject = function(key, callback)
 module.exports.SetObject = SetObject;
 module.exports.DeleteObject = DeleteObject;
 module.exports.checkAndSetCallServerToCompanyObj = checkAndSetCallServerToCompanyObj;
+module.exports.addClusterToCache = addClusterToCache;
