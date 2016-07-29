@@ -81,6 +81,112 @@ var addClusterToCache = function(clusterId)
 
 };
 
+var addSipProfileToCompanyObj = function(profileObj, tenantId, companyId)
+{
+    var ttl = 2000;
+
+    var lockKey = 'DVPCACHELOCK:' + tenantId + ':' + companyId;
+
+    var key = 'DVPCACHE:' + tenantId + ':' + companyId;
+
+    redlock.lock(lockKey, ttl).then(function(lock)
+    {
+        client.get(key, function(err, compStr)
+        {
+            var compObj = {};
+            if(compStr)
+            {
+                try
+                {
+                    compObj = JSON.parse(compStr);
+                }
+                catch(ex)
+                {
+                    compObj = {};
+
+                }
+
+            }
+
+            if(!compObj.SipNetworkProfile)
+            {
+                compObj.SipNetworkProfile = {};
+            }
+
+            compObj.SipNetworkProfile[profileObj.id] = profileObj;
+
+            client.set(key, JSON.stringify(compObj), function(err, compObj)
+            {
+                lock.unlock()
+                    .catch(function(err) {
+                        logger.error('[DVP-ClusterConfiguration.addSipProfileToCompanyObj] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                    });
+
+            });
+        });
+
+    }).catch(function(err)
+    {
+        logger.error('[DVP-ClusterConfiguration.addSipProfileToCompanyObj] - [%s] - REDIS LOCK ACQUIRE FAILED', err);
+    });
+};
+
+var removeSipProfileFromCompanyObj = function(profileId, tenantId, companyId)
+{
+    var ttl = 2000;
+
+    var lockKey = 'DVPCACHELOCK:' + tenantId + ':' + companyId;
+
+    var key = 'DVPCACHE:' + tenantId + ':' + companyId;
+
+    redlock.lock(lockKey, ttl).then(function(lock)
+    {
+        client.get(key, function(err, compStr)
+        {
+            var compObj = {};
+            if(compStr)
+            {
+                try
+                {
+                    compObj = JSON.parse(compStr);
+                }
+                catch(ex)
+                {
+                    compObj = {};
+
+                }
+
+            }
+
+            if(compObj.SipNetworkProfile && compObj.SipNetworkProfile[profileId])
+            {
+                delete compObj.SipNetworkProfile[profileId];
+                client.set(key, JSON.stringify(compObj), function(err, compObj)
+                {
+                    lock.unlock()
+                        .catch(function(err) {
+                            logger.error('[DVP-ClusterConfiguration.addSipProfileToCompanyObj] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                        });
+
+                });
+            }
+            else
+            {
+                lock.unlock()
+                    .catch(function(err) {
+                        logger.error('[DVP-ClusterConfiguration.addSipProfileToCompanyObj] - [%s] - REDIS LOCK RELEASE FAILED', err);
+                    });
+            }
+
+
+        });
+
+    }).catch(function(err)
+    {
+        logger.error('[DVP-ClusterConfiguration.addSipProfileToCompanyObj] - [%s] - REDIS LOCK ACQUIRE FAILED', err);
+    });
+};
+
 var checkAndSetCallServerToCompanyObj = function(newCsObj, tenantId, companyId)
 {
     var ttl = 2000;
@@ -173,4 +279,6 @@ var DeleteObject = function(key, callback)
 module.exports.SetObject = SetObject;
 module.exports.DeleteObject = DeleteObject;
 module.exports.checkAndSetCallServerToCompanyObj = checkAndSetCallServerToCompanyObj;
+module.exports.addSipProfileToCompanyObj = addSipProfileToCompanyObj;
 module.exports.addClusterToCache = addClusterToCache;
+module.exports.removeSipProfileFromCompanyObj = removeSipProfileFromCompanyObj;
