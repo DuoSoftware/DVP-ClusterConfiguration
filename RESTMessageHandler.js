@@ -2719,11 +2719,21 @@ function CreateEndUser(res, req) {
 
                             cloudObject.addCloudEndUser(user).then(function (cloudInstancex) {
 
+                                if(cloudInstancex)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(cloudInstancex, cloudInstancex.CompanyId, cloudInstancex.TenantId);
+                                }
+
                                 logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
 
                                     status = true;
 
                             }).catch(function (err) {
+
+                                if(instance)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(instance, instance.CompanyId, instance.TenantId);
+                                }
 
                                 status = false;
                                 var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
@@ -2845,6 +2855,11 @@ function UpdateEndUser(res, req) {
 
                     }).then(function (updtObj) {
 
+                        if(updtObj)
+                        {
+                            redisCacheHandler.addCloudEndUserToCompanyObj(updtObj, company, tenant);
+                        }
+
 
                         logger.debug('DVP-ClusterConfiguration.UpdateEndUser PGSQL Cloud End User object updated successfully');
                         status = true;
@@ -2930,6 +2945,8 @@ function DeleteEndUser(req,res, userID) {
             else {
 
                 cloudUserObject.destroy().then(function (delObj) {
+
+                    redisCacheHandler.removeCloudEndUserFromCompanyObj(userID, company, tenant);
 
                     logger.debug('DVP-ClusterConfiguration.DeleteEndUser PGSQL Cloud End User removed successfully');
                     status = true;
