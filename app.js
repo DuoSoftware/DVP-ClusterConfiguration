@@ -354,6 +354,17 @@ server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',authorization({res
 } );
 
 
+///////////////////// Audit Trail Service //////////////////////////
+
+server.get('/DVP/API/:version/CloudConfiguration/AuditTrailsPaging',authorization({resource:"audittrail", action:"read"}),function( req, res, next){
+    restMessageHandler.GetAuditTrailsPaging(res, req);
+    return next();
+} );
+
+server.post('/DVP/API/:version/CloudConfiguration/AuditTrail',authorization({resource:"audittrail", action:"write"}),function( req, res, next){
+    restMessageHandler.AddAuditTrail(res, req);
+    return next();
+} );
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 

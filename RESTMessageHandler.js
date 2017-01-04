@@ -3,6 +3,7 @@ var config = require('config');
 var redis = require('redis');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var auditTrailHandler = require('dvp-common/AuditTrail/AuditTrailsHandler.js');
 //var jwt = require('restify-jwt');
 var validator = require('validator');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
@@ -4224,6 +4225,101 @@ function GetNumbersInBlacklist(req, res)
 
 }
 
+function AddAuditTrail(req, res)
+{
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - HTTP Request Received');
+
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+        var iss = req.user.iss;
+
+        var auditTrails = req.body;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        auditTrailHandler.CreateAuditTrails(tenantId,companyId,iss,auditTrails, function(err, auditAddRes)
+        {
+            if(err)
+            {
+                var jsonString = msg.FormatMessage(err, "Exception occurred", false, null);
+                logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = msg.FormatMessage(null, "Success", true, auditAddRes);
+                logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, null);
+        logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
+function GetAuditTrailsPaging(req, res)
+{
+    var emptyArr = [];
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - HTTP Request Received');
+
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        var application = req.query.application;
+        var property = req.query.property;
+        var starttime = req.query.startTime;
+        var endtime = req.query.endTime;
+        var pageSize = req.query.pageSize;
+        var pageNo = req.query.pageNo;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        auditTrailHandler.GetAllAuditTrailsPaging(tenantId,companyId, application, property, starttime, endtime, pageSize, pageNo, function(err, auditRes)
+        {
+            if(err)
+            {
+                var jsonString = msg.FormatMessage(err, "Exception occurred", false, emptyArr);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = msg.FormatMessage(null, "Success", true, auditRes);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, emptyArr);
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
 
 
 module.exports.CreateCluster = CreateCluster;
@@ -4276,3 +4372,5 @@ module.exports.GetCallServersForCompany = GetCallServersForCompany;
 module.exports.AddNumberToBlacklist = AddNumberToBlacklist;
 module.exports.RemoveNumberFromBlacklist = RemoveNumberFromBlacklist;
 module.exports.GetNumbersInBlacklist = GetNumbersInBlacklist;
+module.exports.GetAuditTrailsPaging = GetAuditTrailsPaging;
+module.exports.AddAuditTrail = AddAuditTrail;
