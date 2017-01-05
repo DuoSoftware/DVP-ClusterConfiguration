@@ -4225,7 +4225,7 @@ function GetNumbersInBlacklist(req, res)
 
 }
 
-function AddAuditTrail(req, res)
+function AddAuditTrail(res, req)
 {
     try
     {
@@ -4270,7 +4270,7 @@ function AddAuditTrail(req, res)
 
 }
 
-function GetAuditTrailsPaging(req, res)
+function GetAuditTrailsPaging(res, req)
 {
     var emptyArr = [];
     try
@@ -4283,6 +4283,7 @@ function GetAuditTrailsPaging(req, res)
 
         var application = req.query.application;
         var property = req.query.property;
+        var author = req.query.author;
         var starttime = req.query.startTime;
         var endtime = req.query.endTime;
         var pageSize = req.query.pageSize;
@@ -4293,7 +4294,7 @@ function GetAuditTrailsPaging(req, res)
             throw new Error("Invalid company or tenant");
         }
 
-        auditTrailHandler.GetAllAuditTrailsPaging(tenantId,companyId, application, property, starttime, endtime, pageSize, pageNo, function(err, auditRes)
+        auditTrailHandler.GetAllAuditTrailsPaging(tenantId,companyId, application, property, author, starttime, endtime, pageSize, pageNo, function(err, auditRes)
         {
             if(err)
             {
@@ -4314,6 +4315,54 @@ function GetAuditTrailsPaging(req, res)
     catch(ex)
     {
         var jsonString = msg.FormatMessage(ex, "Exception occurred", false, emptyArr);
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
+function GetAuditTrailsCount(res, req)
+{
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - HTTP Request Received');
+
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        var application = req.query.application;
+        var property = req.query.property;
+        var starttime = req.query.startTime;
+        var endtime = req.query.endTime;
+        var author = req.query.author;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        auditTrailHandler.GetAllAuditTrailsCount(tenantId,companyId, application, property, author, starttime, endtime, function(err, auditCount)
+        {
+            if(err)
+            {
+                var jsonString = msg.FormatMessage(err, "Exception occurred", false, auditCount);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = msg.FormatMessage(null, "Success", true, auditCount);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, 0);
         logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
         res.end(jsonString);
     }
@@ -4374,3 +4423,4 @@ module.exports.RemoveNumberFromBlacklist = RemoveNumberFromBlacklist;
 module.exports.GetNumbersInBlacklist = GetNumbersInBlacklist;
 module.exports.GetAuditTrailsPaging = GetAuditTrailsPaging;
 module.exports.AddAuditTrail = AddAuditTrail;
+module.exports.GetAuditTrailsCount = GetAuditTrailsCount;

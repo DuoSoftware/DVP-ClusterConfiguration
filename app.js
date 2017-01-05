@@ -24,6 +24,7 @@ var server = restify.createServer({
 
 server.pre(restify.pre.userAgentConnection());
 server.use(restify.bodyParser({ mapParams: false }));
+server.use(restify.queryParser());
 
 restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
@@ -365,6 +366,11 @@ server.post('/DVP/API/:version/CloudConfiguration/AuditTrail',authorization({res
     restMessageHandler.AddAuditTrail(res, req);
     return next();
 } );
+
+server.get('/DVP/API/:version/CloudConfiguration/AuditTrails/Count',authorization({resource:"audittrail", action:"read"}),function( req, res, next){
+    restMessageHandler.GetAuditTrailsCount(res, req);
+    return next();
+});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
