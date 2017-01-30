@@ -24,6 +24,7 @@ var server = restify.createServer({
 
 server.pre(restify.pre.userAgentConnection());
 server.use(restify.bodyParser({ mapParams: false }));
+server.use(restify.queryParser());
 
 restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
@@ -354,6 +355,22 @@ server.get('/DVP/API/:version/CloudConfiguration/IPAddresses',authorization({res
 } );
 
 
+///////////////////// Audit Trail Service //////////////////////////
+
+server.get('/DVP/API/:version/CloudConfiguration/AuditTrailsPaging',authorization({resource:"audittrail", action:"read"}),function( req, res, next){
+    restMessageHandler.GetAuditTrailsPaging(res, req);
+    return next();
+} );
+
+server.post('/DVP/API/:version/CloudConfiguration/AuditTrail',authorization({resource:"audittrail", action:"write"}),function( req, res, next){
+    restMessageHandler.AddAuditTrail(res, req);
+    return next();
+} );
+
+server.get('/DVP/API/:version/CloudConfiguration/AuditTrails/Count',authorization({resource:"audittrail", action:"read"}),function( req, res, next){
+    restMessageHandler.GetAuditTrailsCount(res, req);
+    return next();
+});
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
