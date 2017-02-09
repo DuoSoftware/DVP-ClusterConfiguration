@@ -5,10 +5,11 @@
   "main": "RESTMessageHandler.js",
   "dependencies": {
     "config": "^1.19.0",
-    "dvp-common": "^0.1.3",
-    "dvp-dbmodels": "^0.0.47",
+    "dvp-common": "^0.6.4",
+    "dvp-dbmodels": "^0.7.5",
     "http": "^0.0.0",
     "redis": "^2.4.2",
+    "redlock": "^2.0.0",
     "restify": "^4.0.3",
     "restify-jwt": "^0.4.0",
     "swagger-restify-express": "^0.2.1",

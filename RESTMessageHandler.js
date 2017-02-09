@@ -3,15 +3,24 @@ var config = require('config');
 var redis = require('redis');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var msg = require('dvp-common/CommonMessageGenerator/ClientMessageJsonFormatter.js');
+var auditTrailHandler = require('dvp-common/AuditTrail/AuditTrailsHandler.js');
 //var jwt = require('restify-jwt');
 var validator = require('validator');
+var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
 var redisip = config.Redis.ip;
 var redisport = config.Redis.port;
 var redisClient = redis.createClient(redisport, redisip);
 
+
 redisClient.on('error', function (err) {
     console.log('Error ' + err);
 });
+
+var redisCallback = function(err, resp)
+{
+
+};
+
 
 function GetClusterByID(req, res, Id) {
 
@@ -259,7 +268,12 @@ function EditCluster(Id, req, res) {
                         Type: cloudData.Type,
                         Category: cloudData.Category
 
-                    }).then(function (inst) {
+                    }).then(function (inst)
+                    {
+                        if(inst)
+                        {
+                            redisCacheHandler.addClusterToCache(inst.id);
+                        }
 
 
                         logger.debug('DVP-ClusterConfiguration.EditCluster PGSQL Cloud object updated successful');
@@ -387,6 +401,11 @@ function CreateCluster(req, res) {
             cloud
                 .save()
                 .then(function (inst) {
+
+                    if(inst)
+                    {
+                        redisCacheHandler.addClusterToCache(inst.id);
+                    }
 
 
                     logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL Cloud object saved successful');
@@ -703,6 +722,11 @@ function AddLoadBalancer(res, req) {
 
                             cloudObject.setLoadBalancer(loadBalancerObject).then(function (cloudInstancex) {
 
+                                if(cloudObject)
+                                {
+                                    redisCacheHandler.addClusterToCache(cloudObject.id);
+                                }
+
                                 logger.debug("DVP-ClusterConfiguration.AddLoadBalancer LoadBalancer Set Cloud");
 
                                 status = true;
@@ -807,6 +831,11 @@ function ActivateCloud(req,res, id, activate) {
 
                 }).then(function (instance) {
 
+                    if(instance)
+                    {
+                        redisCacheHandler.addClusterToCache(instance.id);
+                    }
+
 
                     status = true;
                     logger.error("DVP-ClusterConfiguration.ActivateCloud PGSQL Cloud Activate Successful");
@@ -910,7 +939,14 @@ function CreateCallServer(res,req) {
 
             callserver
                 .save()
-                .then(function (inst) {
+                .then(function (inst)
+                {
+
+                    if(inst)
+                    {
+                        redisCacheHandler.addCallServerByIdToCache(inst.id, inst);
+                        redisCacheHandler.addCallServerToCompanyObj(inst, tenant, company);
+                    }
 
                     logger.debug('DVP-ClusterConfiguration.CreateCluster PGSQL CallServer object saved successful');
                     status = true;
@@ -1050,6 +1086,12 @@ function EditCallServer(Id, req, res) {
 
                     }).then(function (instance) {
 
+                        if(instance)
+                        {
+                            redisCacheHandler.addCallServerByIdToCache(instance.id, JSON.stringify(instance));
+                            redisCacheHandler.addCallServerToCompanyObj(instance, tenant, company);
+                        }
+
                         logger.debug('DVP-ClusterConfiguration.EditCallServer PGSQL CallServer object updated successful');
                         status = true;
 
@@ -1152,6 +1194,12 @@ function ActivateCallServer(req, res, id, activate) {
                     Activate: activeStatus
 
                 }).then(function (instance) {
+
+                    if(instance)
+                    {
+                        redisCacheHandler.addCallServerByIdToCache(instance.id, JSON.stringify(instance));
+                        redisCacheHandler.addCallServerToCompanyObj(instance, tenant, company);
+                    }
 
                     status = true;
                     logger.debug("DVP-ClusterConfiguration.ActivateCallServer PGSQL CallServer Activated");
@@ -1342,16 +1390,24 @@ function RemoveCallServerFromCloud(req, res, Id, cloudID) {
 
 
 
-        dbmodel.Cloud.find({
-            where: [{id: parseInt(cloudID)}, {Activate: true}, {CompanyId: company}, {TenantId: tenant}],
-            include: [{model: dbmodel.CallServer, as: "CallServer", where: [{id: parseInt(Id)}]}]
-        }).then(function (cloudInstance) {
+        dbmodel.CallServer.find({
+            where: [{id: parseInt(Id)}, {CompanyId: company}, {TenantId: tenant}]
+        }).then(function (csInstance) {
 
-            if (cloudInstance) {
+            if (csInstance) {
 
                 logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL Cloud %s Found", cloudID);
 
-                cloudInstance.removeCallServer(cloudInstance.CallServer).then(function (cloudInstancex) {
+
+                csInstance.updateAttributes({
+                        ClusterId: null
+                }).then(function (instance)
+                {
+                    if(instance)
+                    {
+                        redisCacheHandler.addCallServerByIdToCache(instance.id, JSON.stringify(instance));
+                        redisCacheHandler.addCallServerToCompanyObj(instance, tenant, company);
+                    }
 
                     logger.debug("DVP-ClusterConfiguration.RemoveCallServerFromCloud PGSQL");
 
@@ -1360,15 +1416,17 @@ function RemoveCallServerFromCloud(req, res, Id, cloudID) {
                     res.write(instance);
                     res.end();
 
-                }).catch(function (err) {
+                }).catch(function(ex)
+                {
 
                     status = false;
                     var instance = msg.FormatMessage(err, "RemoveCallservers to cloud", status, undefined);
                     res.write(instance);
                     res.end();
 
-
                 });
+
+
 
             } else {
 
@@ -1438,7 +1496,13 @@ function AddCallServerToCloud(req, res, Id, cloudID) {
 
                         logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL Cloud %s Found", cloudID);
 
-                        cloudInstance.addCallServer(csInstance).then(function (cloudInstancex) {
+                        cloudInstance.addCallServer(csInstance).then(function (instance) {
+
+                            if(instance)
+                            {
+                                redisCacheHandler.addCallServerByIdToCache(instance.id, JSON.stringify(instance));
+                                redisCacheHandler.addCallServerToCompanyObj(instance, tenant, company);
+                            }
 
                             logger.debug("DVP-ClusterConfiguration.AddCallServerToCloud PGSQL");
 
@@ -1540,6 +1604,12 @@ function SetParentCloud(req,res, chilid, parentid) {
 
 
                         childInstance.setParentCloud(parentInstance).then(function (cloudInstancex) {
+
+                            if(childInstance)
+                            {
+                                redisCacheHandler.addClusterToCache(childInstance.id);
+                            }
+
 
                             logger.debug("DVP-ClusterConfiguration.SetParentCloud PGSQL");
 
@@ -2650,11 +2720,21 @@ function CreateEndUser(res, req) {
 
                             cloudObject.addCloudEndUser(user).then(function (cloudInstancex) {
 
+                                if(cloudInstancex)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(cloudInstancex, cloudInstancex.CompanyId, cloudInstancex.TenantId);
+                                }
+
                                 logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
 
                                     status = true;
 
                             }).catch(function (err) {
+
+                                if(instance)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(instance, instance.CompanyId, instance.TenantId);
+                                }
 
                                 status = false;
                                 var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
@@ -2776,6 +2856,11 @@ function UpdateEndUser(res, req) {
 
                     }).then(function (updtObj) {
 
+                        if(updtObj)
+                        {
+                            redisCacheHandler.addCloudEndUserToCompanyObj(updtObj, company, tenant);
+                        }
+
 
                         logger.debug('DVP-ClusterConfiguration.UpdateEndUser PGSQL Cloud End User object updated successfully');
                         status = true;
@@ -2861,6 +2946,8 @@ function DeleteEndUser(req,res, userID) {
             else {
 
                 cloudUserObject.destroy().then(function (delObj) {
+
+                    redisCacheHandler.removeCloudEndUserFromCompanyObj(userID, company, tenant);
 
                     logger.debug('DVP-ClusterConfiguration.DeleteEndUser PGSQL Cloud End User removed successfully');
                     status = true;
@@ -3079,11 +3166,10 @@ function CreateSipProfile(res, req) {
     logger.debug("DVP-ClusterConfiguration.CreateSipProfile HTTP");
 
 
-
     var company;
     var tenant;
 
-    if(req&& req.user && req.user.company && req.user.tenant) {
+    if(req && req.user && req.user.company && req.user.tenant) {
 
         company =req.user.company;
         tenant = req.user.tenant;
@@ -3124,6 +3210,8 @@ function CreateSipProfile(res, req) {
                     profile
                         .save()
                         .then(function (obj) {
+
+                            redisCacheHandler.addSipProfileToCompanyObj(obj, tenant, company);
 
                             logger.error("DVP-ClusterConfiguration.CreateSipProfile PGSQL SipProfile save Failed");
                             var instance = msg.FormatMessage(undefined, "Create SipProfile failed", true, obj);
@@ -3348,6 +3436,8 @@ function DeleteProfileByID(id, req, res) {
 
                     profile.destroy().then(function (obj) {
 
+                        redisCacheHandler.removeSipProfileFromCompanyObj(id, tenant, company);
+
                         var instance = msg.FormatMessage(undefined, "Delete Profile succeed", true, obj);
                         res.write(instance);
                         res.end();
@@ -3456,6 +3546,7 @@ function UpdateProfileByID(id, req, res) {
                                 }).then(function (obj) {
                                     try {
 
+                                        redisCacheHandler.addSipProfileToCompanyObj(obj, tenant, company);
 
                                         logger.error("DVP-ClusterConfiguration.UpdateProfileByID success");
                                         var instance = msg.FormatMessage(undefined, "Update SipProfile done", true, obj);
@@ -3575,6 +3666,8 @@ function AssignSipProfileToCallServer(req, res, profileid, callserverID) {
                         if (csInstance) {
 
                             csInstance.addSipNetworkProfile(profRec).then(function (result) {
+
+                                redisCacheHandler.addSipProfileToCompanyObj(result, tenant, company);
 
                                 status = true;
                                 logger.debug("DVP-ClusterConfiguration.AssignSipProfileToCallServer PGSQL SipProfile %d to CallServer %d ", profileid, callserverID);
@@ -4132,6 +4225,150 @@ function GetNumbersInBlacklist(req, res)
 
 }
 
+function AddAuditTrail(res, req)
+{
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - HTTP Request Received');
+
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+        var iss = req.user.iss;
+
+        var auditTrails = req.body;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        auditTrailHandler.CreateAuditTrails(tenantId,companyId,iss,auditTrails, function(err, auditAddRes)
+        {
+            if(err)
+            {
+                var jsonString = msg.FormatMessage(err, "Exception occurred", false, null);
+                logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = msg.FormatMessage(null, "Success", true, auditAddRes);
+                logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, null);
+        logger.debug('[DVP-ClusterConfiguration.AddAuditTrail] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
+function GetAuditTrailsPaging(res, req)
+{
+    var emptyArr = [];
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - HTTP Request Received');
+
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        var application = req.query.application;
+        var property = req.query.property;
+        var author = req.query.author;
+        var starttime = req.query.startTime;
+        var endtime = req.query.endTime;
+        var pageSize = req.query.pageSize;
+        var pageNo = req.query.pageNo;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        auditTrailHandler.GetAllAuditTrailsPaging(tenantId,companyId, application, property, author, starttime, endtime, pageSize, pageNo, function(err, auditRes)
+        {
+            if(err)
+            {
+                var jsonString = msg.FormatMessage(err, "Exception occurred", false, emptyArr);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = msg.FormatMessage(null, "Success", true, auditRes);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, emptyArr);
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
+function GetAuditTrailsCount(res, req)
+{
+    try
+    {
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - HTTP Request Received');
+
+
+        var companyId = req.user.company;
+        var tenantId = req.user.tenant;
+
+        var application = req.query.application;
+        var property = req.query.property;
+        var starttime = req.query.startTime;
+        var endtime = req.query.endTime;
+        var author = req.query.author;
+
+        if (!companyId || !tenantId)
+        {
+            throw new Error("Invalid company or tenant");
+        }
+
+        auditTrailHandler.GetAllAuditTrailsCount(tenantId,companyId, application, property, author, starttime, endtime, function(err, auditCount)
+        {
+            if(err)
+            {
+                var jsonString = msg.FormatMessage(err, "Exception occurred", false, auditCount);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+            else
+            {
+                var jsonString = msg.FormatMessage(null, "Success", true, auditCount);
+                logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+                res.end(jsonString);
+            }
+
+        })
+
+    }
+    catch(ex)
+    {
+        var jsonString = msg.FormatMessage(ex, "Exception occurred", false, 0);
+        logger.debug('[DVP-ClusterConfiguration.GetAuditTrailsPaging] - API RESPONSE : %s', jsonString);
+        res.end(jsonString);
+    }
+
+}
+
 
 
 module.exports.CreateCluster = CreateCluster;
@@ -4184,3 +4421,6 @@ module.exports.GetCallServersForCompany = GetCallServersForCompany;
 module.exports.AddNumberToBlacklist = AddNumberToBlacklist;
 module.exports.RemoveNumberFromBlacklist = RemoveNumberFromBlacklist;
 module.exports.GetNumbersInBlacklist = GetNumbersInBlacklist;
+module.exports.GetAuditTrailsPaging = GetAuditTrailsPaging;
+module.exports.AddAuditTrail = AddAuditTrail;
+module.exports.GetAuditTrailsCount = GetAuditTrailsCount;
