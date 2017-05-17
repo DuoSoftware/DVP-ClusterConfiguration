@@ -2916,6 +2916,353 @@ function UpdateEndUser(res, req) {
 
 }
 
+function GetEndUsers(req, res) {
+
+
+    logger.debug("DVP-ClusterConfiguration.EndUsers HTTP");
+
+
+    var company;
+    var tenant;
+
+    if(req&& req.user && req.user.company && req.user.tenant) {
+
+        company =req.user.company;
+        tenant = req.user.tenant;
+
+        dbmodel.CloudEndUser.findAll({where:[{CompanyId: company}, {TenantId: tenant}]}).then(function (enduser) {
+
+
+            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found");
+
+
+            try {
+                var instance = msg.FormatMessage(undefined, "Get EndUser", true, enduser);
+                res.write(instance);
+                res.end();
+            } catch (exp) {
+
+
+            }
+
+
+        }).catch(function (err) {
+
+
+            logger.error("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound", err);
+            var instance = msg.FormatMessage(err, "Get EndUser failed", false, undefined);
+            res.write(instance);
+            res.end();
+
+        });
+
+    }else{
+
+        res.write(msg.FormatMessage(err, "Token error, no company data found", false, undefined));
+        res.end();
+
+    }
+
+
+
+
+}
+
+function CreateEndUserTenant(res, req) {
+
+
+    logger.debug("DVP-ClusterConfiguration.CreateEndUser HTTP");
+
+
+    var company;
+    var tenant;
+
+    if(req&& req.user && req.user.company && req.user.tenant) {
+
+        company =req.user.company;
+        tenant = req.user.tenant;
+
+        var status = false;
+        if (req.body) {
+
+
+            logger.debug("DVP-ClusterConfiguration.CreateEndUser Object Validated", req.body);
+
+
+            var userData = req.body;
+
+            dbmodel.Cloud.find({where: [{id: userData.ClusterID}, {Activate: true}, {CompanyId: company}, {TenantId: tenant}]}).then(function (cloudObject) {
+                if (cloudObject) {
+
+
+                    var user = dbmodel.CloudEndUser.build({
+                        Domain: userData.Domain,
+                        CompanyId: userData.ClientCompany,
+                        TenantId: tenant,
+                        SIPConnectivityProvision: userData.SIPConnectivityProvision
+
+                    });
+
+
+                    user
+                        .save()
+                        .then(function (instance) {
+
+
+                            logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser object saved successful');
+                            status = true;
+
+
+                            cloudObject.addCloudEndUser(user).then(function (cloudInstancex) {
+
+                                if(cloudInstancex)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(cloudInstancex, cloudInstancex.CompanyId, cloudInstancex.TenantId);
+                                }
+
+                                logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
+
+                                status = true;
+
+                            }).catch(function (err) {
+
+                                if(instance)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(instance, instance.CompanyId, instance.TenantId);
+                                }
+
+                                status = false;
+                                var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
+                                res.write(instance);
+                                res.end();
+
+                            });
+
+
+                            try {
+
+                                var instance = msg.FormatMessage(undefined, "Create EndUser Done", status, undefined);
+                                res.write(instance);
+                                res.end();
+
+
+                            }
+                            catch (exp) {
+
+                                console.log("There is a error in --> CreateEndUser ", exp);
+
+                            }
+                        }).catch(function (err) {
+
+                            logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL CloudEnduser Save Failed ", err);
+                            status = false;
+                            var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+                        });
+
+                }
+                else {
+
+                    logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID);
+                    var instance = msg.FormatMessage(new Error('Create EndUser failed'), "Create EndUser failed", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+                }
+            }).catch(function (err) {
+
+                logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID, err);
+                var instance = msg.FormatMessage(err, "Create EndUser failed", status, undefined);
+                res.write(instance);
+                res.end();
+
+            });
+
+
+        }
+        else {
+
+            logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Object Validation failed");
+            var instance = msg.FormatMessage(undefined, "Create EndUser failed", status, undefined);
+            res.write(instance);
+            res.end();
+
+        }
+
+
+    }else{
+
+        res.write(msg.FormatMessage(new Error('Token error, no company data found'), "Token error, no company data found", false, undefined));
+        res.end();
+
+    }
+
+
+
+
+
+}
+
+function UpdateEndUserTenant(res, req) {
+
+
+    logger.debug("DVP-ClusterConfiguration.UpdateEndUser HTTP");
+
+
+    var company;
+    var tenant;
+
+    if(req&& req.user && req.user.company && req.user.tenant) {
+
+        company =req.user.company;
+        tenant = req.user.tenant;
+
+
+        var provision = 0;
+        var status = false;
+        if (req.body) {
+
+
+            logger.debug("DVP-ClusterConfiguration.UpdateEndUser Object Validated", req.body);
+
+
+            var userData = req.body;
+
+
+            dbmodel.CloudEndUser.find({where: [{id: req.params.id}, {CompanyId: userData.ClientCompany}, {TenantId: tenant}]}).then(function (cloudUserObject) {
+                if (!cloudUserObject) {
+
+                    status = false;
+
+                    logger.error("DVP-ClusterConfiguration.UpdateEndUser PGSQL Cloud End user %d not found", id);
+                    var instance = msg.FormatMessage(new Error("No user found"), "No user found", status, undefined);
+                    res.write(instance);
+                    res.end();
+                }
+                else {
+
+                    cloudUserObject.updateAttributes({
+
+                        Domain: userData.Domain,
+                        SIPConnectivityProvision: userData.SIPConnectivityProvision
+
+
+                    }).then(function (updtObj) {
+
+                        if(updtObj)
+                        {
+                            redisCacheHandler.addCloudEndUserToCompanyObj(updtObj, company, tenant);
+                        }
+
+
+                        logger.debug('DVP-ClusterConfiguration.UpdateEndUser PGSQL Cloud End User object updated successfully');
+                        status = true;
+                        var instance = msg.FormatMessage(undefined, "Cluster Update", status, updtObj);
+                        res.write(instance);
+                        res.end();
+
+
+                    }).catch(function (err) {
+
+                        status = false;
+
+                        logger.error("DVP-ClusterConfiguration.EditCluster PGSQL Update failed ", err);
+                        var instance = msg.FormatMessage(err, "Cluster Update Error", status, undefined);
+                        res.write(instance);
+                        res.end();
+
+
+                    });
+
+
+                    var instance = msg.FormatMessage(err, "Update EndUser failed", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+                }
+            }).catch(function (err) {
+
+
+            });
+
+
+        }
+        else {
+
+            logger.error("DVP-ClusterConfiguration.UpdateEndUser PGSQL Object Validation failed");
+            var instance = msg.FormatMessage(undefined, "Update EndUser failed", status, undefined);
+            res.write(instance);
+            res.end();
+
+        }
+
+
+    }else{
+
+        res.write(msg.FormatMessage(err, "Token error, no company data found", false, undefined));
+        res.end();
+
+    }
+
+
+
+
+}
+
+function GetEndUsersTenant(req, res) {
+
+
+    logger.debug("DVP-ClusterConfiguration.EndUsers HTTP");
+
+
+    var company;
+    var tenant;
+
+    if(req&& req.user && req.user.company && req.user.tenant) {
+
+        company =req.params.ClientCompany;
+        tenant = req.user.tenant;
+
+        dbmodel.CloudEndUser.findAll({where:[{CompanyId: company}, {TenantId: tenant}]}).then(function (enduser) {
+
+
+            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found");
+
+
+            try {
+                var instance = msg.FormatMessage(undefined, "Get EndUser", true, enduser);
+                res.write(instance);
+                res.end();
+            } catch (exp) {
+
+
+            }
+
+
+        }).catch(function (err) {
+
+
+            logger.error("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound", err);
+            var instance = msg.FormatMessage(err, "Get EndUser failed", false, undefined);
+            res.write(instance);
+            res.end();
+
+        });
+
+    }else{
+
+        res.write(msg.FormatMessage(err, "Token error, no company data found", false, undefined));
+        res.end();
+
+    }
+
+
+
+
+}
+
 function DeleteEndUser(req,res, userID) {
 
 
@@ -2986,58 +3333,6 @@ function DeleteEndUser(req,res, userID) {
 
     }
 
-
-
-
-
-}
-
-function GetEndUsers(req, res) {
-
-
-    logger.debug("DVP-ClusterConfiguration.EndUsers HTTP");
-
-
-    var company;
-    var tenant;
-
-    if(req&& req.user && req.user.company && req.user.tenant) {
-
-        company =req.user.company;
-        tenant = req.user.tenant;
-
-        dbmodel.CloudEndUser.findAll({where:[{CompanyId: company}, {TenantId: tenant}]}).then(function (enduser) {
-
-
-            logger.debug("DVP-ClusterConfiguration.EndUser PGSQL EndUsers Found");
-
-
-            try {
-                var instance = msg.FormatMessage(undefined, "Get EndUser", true, enduser);
-                res.write(instance);
-                res.end();
-            } catch (exp) {
-
-
-            }
-
-
-        }).catch(function (err) {
-
-
-            logger.error("DVP-ClusterConfiguration.EndUsers PGSQL EndUser NotFound", err);
-            var instance = msg.FormatMessage(err, "Get EndUser failed", false, undefined);
-            res.write(instance);
-            res.end();
-
-        });
-
-    }else{
-
-        res.write(msg.FormatMessage(err, "Token error, no company data found", false, undefined));
-        res.end();
-
-    }
 
 
 
@@ -4424,3 +4719,6 @@ module.exports.GetNumbersInBlacklist = GetNumbersInBlacklist;
 module.exports.GetAuditTrailsPaging = GetAuditTrailsPaging;
 module.exports.AddAuditTrail = AddAuditTrail;
 module.exports.GetAuditTrailsCount = GetAuditTrailsCount;
+module.exports.CreateEndUserTenant = CreateEndUserTenant;
+module.exports.UpdateEndUserTenant = UpdateEndUserTenant;
+module.exports.GetEndUsersTenant = GetEndUsersTenant;
