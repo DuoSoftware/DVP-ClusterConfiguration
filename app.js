@@ -249,6 +249,27 @@ server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization
     return next();
 } );
 
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', authorization({resource:"enduser", action:"read"}),function( req, res, next){
+    restMessageHandler.GetEndUsers(req, res);
+    return next();
+} );
+
+server.post('/DVP/API/:version/CloudConfiguration/CloudEndUserTenant',authorization({resource:"tenant", action:"write"}),function( req, res, next){
+    restMessageHandler.CreateEndUserTenant(res, req);
+    return next();
+} );
+
+// Pawan
+server.put('/DVP/API/:version/CloudConfiguration/CloudEndUserTenant/:id',authorization({resource:"tenant", action:"write"}),function( req, res, next){
+    restMessageHandler.UpdateEndUserTenant(res, req);
+    return next();
+} );
+
+server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsersTenant/:ClientCompany', authorization({resource:"tenant", action:"read"}),function( req, res, next){
+    restMessageHandler.GetEndUsersTenant(req, res);
+    return next();
+} );
+
 
 server.get('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"read"}),function( req, res, next){
     restMessageHandler.GetEndUser(req.params.id, req, res);
@@ -261,10 +282,7 @@ server.del('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization
     return next();
 } );
 
-server.get('/DVP/API/:version/CloudConfiguration/CloudEndUsers', authorization({resource:"enduser", action:"read"}),function( req, res, next){
-    restMessageHandler.GetEndUsers(req, res);
-    return next();
-} );
+
 
 
 server.get('/DVP/API/:version/CloudConfiguration/CloudEndUserByClusterID/:id', authorization({resource:"enduser", action:"read"}),function( req, res, next){
