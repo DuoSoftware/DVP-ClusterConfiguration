@@ -9,7 +9,8 @@
 
 
 FROM node:5.10.0
-RUN git clone git://github.com/DuoSoftware/DVP-ClusterConfiguration.git /usr/local/src/clusterconfiguration
+ARG VERSION_TAG
+RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-ClusterConfiguration.git /usr/local/src/clusterconfiguration
 RUN cd /usr/local/src/clusterconfiguration;
 WORKDIR /usr/local/src/clusterconfiguration
 RUN npm install
