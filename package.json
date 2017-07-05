@@ -5,7 +5,7 @@
   "main": "RESTMessageHandler.js",
   "dependencies": {
     "config": "^1.19.0",
-    "dvp-common": "^0.6.4",
+    "dvp-common": "^0.8.4",
     "dvp-dbmodels": "^0.7.5",
     "http": "^0.0.0",
     "ioredis": "^3.1.1",
