@@ -349,3 +349,4 @@ module.exports.checkAndSetCallServerToCompanyObj = checkAndSetCallServerToCompan
 module.exports.addSipProfileToCompanyObj = addSipProfileToCompanyObj;
 module.exports.addClusterToCache = addClusterToCache;
 module.exports.removeSipProfileFromCompanyObj = removeSipProfileFromCompanyObj;
+module.exports.redisClient = client;

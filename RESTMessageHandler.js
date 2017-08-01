@@ -7,19 +7,8 @@ var auditTrailHandler = require('dvp-common/AuditTrail/AuditTrailsHandler.js');
 //var jwt = require('restify-jwt');
 var validator = require('validator');
 var redisCacheHandler = require('dvp-common/CSConfigRedisCaching/RedisHandler.js');
-var redisip = config.Redis.ip;
-var redisport = config.Redis.port;
-var redisClient = redis.createClient(redisport, redisip);
+var redisClient = require('./RedisHandler.js').redisClient;
 
-
-redisClient.on('error', function (err) {
-    console.log('Error ' + err);
-});
-
-var redisCallback = function(err, resp)
-{
-
-};
 
 
 function GetClusterByID(req, res, Id) {
