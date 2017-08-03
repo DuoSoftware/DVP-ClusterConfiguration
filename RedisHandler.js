@@ -1,5 +1,5 @@
 var redis = require("ioredis");
-var Config = require('config');
+var config = require('config');
 var Redlock = require('redlock');
 var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
 var dbmodel = require('dvp-dbmodels');
@@ -349,3 +349,4 @@ module.exports.checkAndSetCallServerToCompanyObj = checkAndSetCallServerToCompan
 module.exports.addSipProfileToCompanyObj = addSipProfileToCompanyObj;
 module.exports.addClusterToCache = addClusterToCache;
 module.exports.removeSipProfileFromCompanyObj = removeSipProfileFromCompanyObj;
+module.exports.redisClient = client;
