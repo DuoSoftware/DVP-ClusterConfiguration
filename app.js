@@ -2,7 +2,7 @@
  * Created by a on 1/27/2015.
  */
 var restify = require('restify');
-var sre = require('swagger-restify-express');
+//var sre = require('swagger-restify-express');
 var http = require('http');
 //var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
