@@ -243,6 +243,11 @@ server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',authorization({r
     return next();
 } );
 
+server.post('/DVP/API/:version/CloudConfiguration/DefaultCloudEndUser',authorization({resource:"enduser", action:"write"}),function( req, res, next){
+    restMessageHandler.CreateDefaultEndUser(res, req);
+    return next();
+} );
+
 // Pawan
 server.put('/DVP/API/:version/CloudConfiguration/CloudEndUser/:id',authorization({resource:"enduser", action:"write"}),function( req, res, next){
     restMessageHandler.UpdateEndUser(res, req);

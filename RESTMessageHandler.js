@@ -2799,6 +2799,151 @@ function CreateEndUser(res, req) {
 
 }
 
+
+function CreateDefaultEndUser(res, req) {
+
+
+    logger.debug("DVP-ClusterConfiguration.CreateEndUser HTTP");
+
+
+    if(req&& req.user && req.user.company && req.user.tenant)
+    {
+
+        var provision = 0;
+        var status = false;
+        if (req.body)
+        {
+            logger.debug("DVP-ClusterConfiguration.CreateEndUser Object Validated", req.body);
+
+
+            var userData = req.body;
+
+            dbmodel.Cloud.find({where: [{Code: userData.ClusterCode}, {Activate: true}]}).then(function (cloudObject) {
+                if (cloudObject) {
+
+
+                    logger.debug("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d Found", userData.ClusterID);
+
+                    console.log(cloudObject)
+
+                    if (0 < userData.Provision && userData.Provision < 4) {
+
+                        logger.debug("DVP-ClusterConfiguration.CreateEndUser CloudEnduser Provision data correct");
+                        provision = userData.Provision;
+
+                    }
+                    else {
+
+                        logger.debug("DVP-ClusterConfiguration.CreateEndUser CloudEnduser Provision data incorrect proceed with sheared");
+
+                    }
+
+                    var user = dbmodel.CloudEndUser.build({
+                        Domain: userData.Domain,
+                        CompanyId: userData.ClientCompany,
+                        TenantId: userData.ClientTenant,
+                        SIPConnectivityProvision: provision
+
+                    });
+
+
+                    user
+                        .save()
+                        .then(function (instance) {
+
+
+                            logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser object saved successful');
+                            status = true;
+
+
+                            cloudObject.addCloudEndUser(user).then(function (cloudInstancex) {
+
+                                if(cloudInstancex)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(cloudInstancex, cloudInstancex.CompanyId, cloudInstancex.TenantId);
+                                }
+
+                                logger.debug('DVP-ClusterConfiguration.CreateEndUserNetwork PGSQL CloudEnduser added to Cloud ');
+
+                                status = true;
+
+                            }).catch(function (err) {
+
+                                if(instance)
+                                {
+                                    redisCacheHandler.addCloudEndUserToCompanyObj(instance, instance.CompanyId, instance.TenantId);
+                                }
+
+                                status = false;
+                                var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
+                                res.write(instance);
+                                res.end();
+
+                            });
+
+
+                            try {
+
+                                var instance = msg.FormatMessage(undefined, "Create EndUser Done", status, undefined);
+                                res.write(instance);
+                                res.end();
+
+
+                            }
+                            catch (exp) {
+
+                                console.log("There is a error in --> CreateEndUser ", exp);
+
+                            }
+                        }).catch(function (err) {
+
+                            logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL CloudEnduser Save Failed ", err);
+                            status = false;
+                            var instance = msg.FormatMessage(err, "Create EndUser", status, undefined);
+                            res.write(instance);
+                            res.end();
+
+                        });
+
+                }
+                else {
+
+                    logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID);
+                    var instance = msg.FormatMessage(new Error('Create EndUser failed'), "Create EndUser failed", status, undefined);
+                    res.write(instance);
+                    res.end();
+
+                }
+            }).catch(function (err) {
+
+                logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Cloud %d NotFound", userData.clusterID, err);
+                var instance = msg.FormatMessage(err, "Create EndUser failed", status, undefined);
+                res.write(instance);
+                res.end();
+
+            });
+
+
+        }
+        else {
+
+            logger.error("DVP-ClusterConfiguration.CreateEndUser PGSQL Object Validation failed");
+            var instance = msg.FormatMessage(undefined, "Create EndUser failed", status, undefined);
+            res.write(instance);
+            res.end();
+
+        }
+
+
+    }else{
+
+        res.write(msg.FormatMessage(new Error('Token error, no company data found'), "Token error, no company data found", false, undefined));
+        res.end();
+
+    }
+
+}
+
 function UpdateEndUser(res, req) {
 
 
@@ -4711,3 +4856,4 @@ module.exports.GetAuditTrailsCount = GetAuditTrailsCount;
 module.exports.CreateEndUserTenant = CreateEndUserTenant;
 module.exports.UpdateEndUserTenant = UpdateEndUserTenant;
 module.exports.GetEndUsersTenant = GetEndUsersTenant;
+module.exports.CreateDefaultEndUser = CreateDefaultEndUser;
