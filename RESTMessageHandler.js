@@ -2818,7 +2818,7 @@ function CreateDefaultEndUser(res, req) {
 
             var userData = req.body;
 
-            dbmodel.Cloud.find({where: [{Code: userData.ClusterCode}, {Activate: true}]}).then(function (cloudObject) {
+            dbmodel.Cloud.find({where: [{Name: userData.ClusterName}, {Activate: true}]}).then(function (cloudObject) {
                 if (cloudObject) {
 
 
