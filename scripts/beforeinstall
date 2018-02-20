@@ -1,0 +1,5 @@
+#!/bin/bash
+# AWS CODE DEPLOY
+
+rm -rf /usr/src/DVP-ClusterConfiguration/*
+
