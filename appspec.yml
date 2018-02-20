@@ -12,3 +12,5 @@ hooks:
     - location: scripts/applicationstop
   ApplicationStart:
     - location: scripts/applicationstart 
+  AfterInstall:
+    - location: scripts/afterinstall
