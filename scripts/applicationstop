@@ -1,0 +1,10 @@
+#!/bin/bash
+# AWS CODE DEPLOY
+
+isExistClusterConfig=$(docker ps -a | grep clusterconfig)
+
+if [ "$isExistClusterConfig" ]
+then
+    docker rm -f clusterconfig
+    docker rmi clusterconfig
+ fi

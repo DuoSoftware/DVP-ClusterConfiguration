@@ -1,0 +1,8 @@
+#!/bin/bash
+# AWS CODE DEPLOY
+
+cd /usr/src/DVP-ClusterConfiguration
+docker build -t "clusterconfig" .
+
+docker run -d -t --memory="512m" -v /etc/localtime:/etc/localtime:ro --env="COMPOSE_DATE=$DATE" --env="NODE_CONFIG_DIR=/usr/local/src/clusterconfiguration/config" --env="HOST_CLUSTERCONFIGURATION_PORT=8805" --env="HOST_VERSION=$HOST_VERSION" --env="SYS_DATABASE_HOST=$DATABASE_HOST" --env="HOST_TOKEN=$HOST_TOKEN" --env="SYS_DATABASE_TYPE=$DATABASE_TYPE" --env="SYS_DATABASE_POSTGRES_USER=$DATABASE_POSTGRES_USER" --env="SYS_DATABASE_POSTGRES_PASSWORD=$DATABASE_POSTGRES_PASSWORD" --env="SYS_SQL_PORT=$SQL_PORT" --env="SYS_REDIS_HOST=master.redis-beta.nbtykp.use1.cache.amazonaws.com" --env="SYS_REDIS_PASSWORD=DuoS123456789000" --env="SYS_REDIS_PORT=6379" --env="SYS_REDIS_MODE=instance" --env="SYS_REDIS_SENTINEL_HOSTS=$REDIS_SENTINEL_HOSTS" --env="SYS_REDIS_SENTINEL_PORT=$REDIS_SENTINEL_PORT" --env="SYS_REDIS_SENTINEL_NAME=$REDIS_SENTINEL_NAME" --env="SYS_REDIS_DB_CONFIG=$REDIS_DB_CONFIG" --env="SYS_RABBITMQ_HOST=$RABBITMQ_HOST" --env="SYS_RABBITMQ_PORT=$RABBITMQ_PORT" --env="SYS_RABBITMQ_USER=$RABBITMQ_USER" --env="SYS_RABBITMQ_PASSWORD=$RABBITMQ_PASSWORD" --env="SYS_MONGO_HOST=$MONGO_HOST" --env="SYS_MONGO_USER=$MONGO_USER" --env="SYS_MONGO_PASSWORD=$MONGO_PASSWORD"  --env="SYS_MONGO_DB=$MONGO_DB" --env="SYS_MONGO_PORT=$MONGO_PORT" --env="SYS_MONGO_REPLICASETNAME=$MONGO_REPLICA_SET_NAME" --env="VIRTUAL_HOST=clusterconfig.*" --env="LB_FRONTEND=clusterconfig.$FRONTEND" --env="LB_PORT=$LB_PORT" --expose=8805/tcp --log-opt max-size=10m --log-opt max-file=10 --restart=always --name clusterconfig clusterconfig node /usr/local/src/clusterconfiguration/app.js;
+

@@ -2,7 +2,7 @@
  * Created by a on 1/27/2015.
  */
 var restify = require('restify');
-var sre = require('swagger-restify-express');
+//var sre = require('swagger-restify-express');
 var http = require('http');
 //var winston = require('winston');
 var restMessageHandler = require('./RESTMessageHandler.js');
@@ -240,6 +240,11 @@ server.get('/DVP/API/:version/CloudConfiguration/NetworksByClusterID/:id', autho
 
 server.post('/DVP/API/:version/CloudConfiguration/CloudEndUser',authorization({resource:"enduser", action:"write"}),function( req, res, next){
     restMessageHandler.CreateEndUser(res, req);
+    return next();
+} );
+
+server.post('/DVP/API/:version/CloudConfiguration/DefaultCloudEndUser',authorization({resource:"enduser", action:"write"}),function( req, res, next){
+    restMessageHandler.CreateDefaultEndUser(res, req);
     return next();
 } );
 

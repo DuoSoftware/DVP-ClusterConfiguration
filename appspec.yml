@@ -1,0 +1,16 @@
+# AWS CODE DEPLOY
+
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /usr/src/DVP-ClusterConfiguration
+hooks:
+  BeforeInstall:
+    - location: scripts/beforeinstall
+  ApplicationStop:
+    - location: scripts/applicationstop
+  ApplicationStart:
+    - location: scripts/applicationstart 
+  AfterInstall:
+    - location: scripts/afterinstall
