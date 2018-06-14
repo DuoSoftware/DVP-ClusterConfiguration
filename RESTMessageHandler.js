@@ -4236,11 +4236,11 @@ function GetCallServersForCompany(req, res) {
                                             where: [{CompanyId: company}, {TenantId: tenant}, {ObjType: "INTERNAL"}],
                                             include: [{model: dbmodel.CallServer, as: "CallServer"}]
                                         })
-                                        .then(function (res) {
-                                            if (res) {
+                                        .then(function (resProfile) {
+                                            if (resProfile) {
                                                 logger.debug('[DVP-DynamicConfigurationGenerator.GetCloudForIncomingRequest] PGSQL Get sip profile query success');
-                                                if (res.CallServer) {
-                                                    tempEmptyArr.push(res.CallServer);
+                                                if (resProfile.CallServer) {
+                                                    tempEmptyArr.push(resProfile.CallServer);
                                                     var respJson = msg.FormatMessage(undefined, "Call Server Found", true, tempEmptyArr);
                                                     res.write(respJson);
                                                     res.end();
