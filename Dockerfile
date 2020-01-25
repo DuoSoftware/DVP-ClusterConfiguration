@@ -8,11 +8,19 @@
 #EXPOSE 8805
 
 
-FROM node:9.9.0
-ARG VERSION_TAG
-RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-ClusterConfiguration.git /usr/local/src/clusterconfiguration
-RUN cd /usr/local/src/clusterconfiguration;
+# FROM node:9.9.0
+# ARG VERSION_TAG
+# RUN git clone -b $VERSION_TAG https://github.com/DuoSoftware/DVP-ClusterConfiguration.git /usr/local/src/clusterconfiguration
+# RUN cd /usr/local/src/clusterconfiguration;
+# WORKDIR /usr/local/src/clusterconfiguration
+# RUN npm install
+# EXPOSE 8805
+# CMD [ "node", "/usr/local/src/clusterconfiguration/app.js" ]
+
+FROM node:10-alpine
 WORKDIR /usr/local/src/clusterconfiguration
+COPY package*.json ./
 RUN npm install
+COPY . .
 EXPOSE 8805
-CMD [ "node", "/usr/local/src/clusterconfiguration/app.js" ]
+CMD [ "node", "app.js" ]
