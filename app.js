@@ -14,9 +14,9 @@ var host = config.Host.vdomain || 'localhost';
 var jwt = require('restify-jwt');
 var secret = require('dvp-common/Authentication/Secret.js');
 var authorization = require('dvp-common/Authentication/Authorization.js');
-
-
-
+var healthcheck = require('dvp-healthcheck/DBHealthChecker');
+var {redisClient} = require('./RedisHandler');
+var dbModel = require('dvp-dbmodels');
 
 var server = restify.createServer({
     name: "DVP Cluster Service"
@@ -30,8 +30,11 @@ restify.CORS.ALLOW_HEADERS.push('authorization');
 server.use(restify.CORS());
 server.use(restify.fullResponse());
 
-server.use(jwt({secret: secret.Secret}));
+server.use(jwt({secret: secret.Secret}).unless({path: ['/healthcheck']}));
 
+// Health Check
+hc = new healthcheck(server, {redis: redisClient, pg: dbModel.SequelizeConn });
+hc.Initiate();
 
 //////////////////////////////Cloud API/////////////////////////////////////////////////////
 
