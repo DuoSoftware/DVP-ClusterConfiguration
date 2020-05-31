@@ -1,7 +1,7 @@
 var redis = require("ioredis");
 var config = require('config');
 var Redlock = require('redlock');
-var logger = require('dvp-common/LogHandler/CommonLogHandler.js').logger;
+var logger = require('dvp-common-lite/LogHandler/CommonLogHandler.js').logger;
 var dbmodel = require('dvp-dbmodels');
 
 var redisip = config.Redis.ip;
