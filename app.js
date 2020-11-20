@@ -15,7 +15,7 @@ var jwt = require('restify-jwt');
 var secret = require('dvp-common-lite/Authentication/Secret.js');
 var authorization = require('dvp-common-lite/Authentication/Authorization.js');
 var healthcheck = require('dvp-healthcheck/DBHealthChecker');
-var {redisClient} = require('./RedisHandler');
+var redisClient = require('./RedisHandler');
 var dbModel = require('dvp-dbmodels');
 
 var server = restify.createServer({
